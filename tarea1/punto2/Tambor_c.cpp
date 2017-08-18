@@ -138,9 +138,10 @@ double f_lambda(double lambda){
 
 void roots_lambda(std::vector<double> & roots,double & lambda){
   std::cout<<"comenze con roots"<<std::endl;
-  roots[0]=bisection(2,3,100,1.0e-3)/lambda;
-  std::cout<<"comenze con roots"<<std::endl;
-  roots[1]=bisection(5,6,100,1.0e-3)/lambda;
+  roots[0]=bisection(2,3,100,1.0e-4)/lambda;
+  std::cout<<roots[0]<<std::endl;
+  roots[1]=bisection(5,6,100,1.0e-4)/lambda;
+  std::cout<<roots[1]<<std::endl;
   std::cout<<"comenze con roots"<<std::endl;
   roots[2]=bisection(8,9,100,1.0e-3)/lambda;
   std::cout<<"comenze con roots"<<std::endl;
@@ -188,6 +189,7 @@ void roots_lambda(std::vector<double> & roots,double & lambda){
   std::cout<<"comenze con roots"<<std::endl;
   roots[24]=bisection(77,78,100,1.0e-3)/lambda;    
   std::cout<<"termine roots"<<std::endl;
+  
 }
   
       
@@ -198,7 +200,7 @@ void plot_functions(const std::vector<double> & roots){
   const double h = 0.01;
   double r;
   //limite superior del radio
-  double Lim= 1;
+  double Lim= 5;
   
   //numero de pasos del radio
   int N = Lim/h;
@@ -207,17 +209,31 @@ void plot_functions(const std::vector<double> & roots){
 //--------------------{R(0) ,R'(0)}
   std::vector<double> x {1.0  , 0.0};
   std::vector<double> x_tmp = x;
+  std::vector<double> x_tmp2 (50);
 
   std::ofstream curvas;
   curvas.open("Tambor.dat");
 
+  for(int jj=0;jj<25;jj++){
+    x_tmp2[2*jj]=x[0];
+    x_tmp2[2*jj+1]=x[1];
+  }
+
+  
+  
   for(int step = 0; step < N; ++step){
     r = 0.01 + step*h;
     curvas<<r<<"  ";
+    
     for(int ii = 0; ii<25;ii++){
+      x_tmp[0]=x_tmp2[2*ii];
+      x_tmp[1]=x_tmp2[2*ii+1];
+    
       argumentos[0]=roots[ii];
       runge(x_tmp,argumentos, r, h);
       curvas<<x_tmp[0]<<"  ";
+      x_tmp2[2*ii]=x_tmp[0];
+      x_tmp2[2*ii+1]=x_tmp[1];
     }
     curvas<<std::endl;
   }
