@@ -13,9 +13,13 @@ void plot_functions(const std::vector<double> & roots);
 
 int main(void)
 {
+  //-----------guarda los primeros 25 valores de lambda para los cuales f(r=5)=0
   std::vector<double> roots (25);
-  double lambda = 5;
-  roots_lambda(roots,lambda);
+  double r = 5;
+  //----------toma las raices de j_0(lambda) y las divide entre 5
+  roots_lambda(roots,r);
+
+  //dibuja las funciones de bessel para los valores de lambda en los cuales f(lambda*5)=0
   plot_functions(roots);
   
   return 0;
@@ -84,6 +88,8 @@ void runge(std::vector<double> & x, const std::vector<double> & arg, double t, d
   }
 }
 
+//metodo de biseccion
+
 double bisection(double a, double b, int N_MAX, double eps){
   double r;
   for(int ii = 1; ii<=N_MAX; ii++){
@@ -101,6 +107,7 @@ double bisection(double a, double b, int N_MAX, double eps){
   return r;
 }
 
+//funcion que calcula el valor de f(lambda*r) con r=1
 double f_lambda(double lambda){
 //--------------------{R(0) ,R'(0)}
   std::vector<double> x {1.0  , 0.0};
@@ -136,6 +143,8 @@ double f_lambda(double lambda){
 }
 
 
+//por medio de biseccion encuentra ceros alrededor de los numeros
+//que se encontro en el punto b
 void roots_lambda(std::vector<double> & roots,double & lambda){
   std::cout<<"comenze con roots"<<std::endl;
   roots[0]=bisection(2,3,100,1.0e-4)/lambda;
@@ -193,7 +202,7 @@ void roots_lambda(std::vector<double> & roots,double & lambda){
 }
   
       
-  
+//dibuja para   
 void plot_functions(const std::vector<double> & roots){
   std::cout<<"empeze graficas"<<std::endl;
   //paso de r
