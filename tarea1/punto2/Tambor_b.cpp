@@ -13,13 +13,48 @@ double bisection(double a, double b, int N_MAX, double eps);
 
 int main(void)
 {
-  double a=2, b=3;
-  for(int ii = 0; ii<25;ii++){
-    std::cout<<biseccion(a,b,100,1.0e-3)<<std::endl;
-    a+=3;
-    b+=3
-  }
+  /*
+    std::cout<<bisection(2,3,100,1.0e-4)<<std::endl;
+    std::cout<<bisection(5,6,100,1.0e-4)<<std::endl;
+    std::cout<<bisection(8,9,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(11,12,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(14,15,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(17,19,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(20,22,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(23,25,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(27,28,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(30,31,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(33,34,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(36,37,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(39,41,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(42,43,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(45,46,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(49,50,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(52,53,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(55,56,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(58,59,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(61,62,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(64,66,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(67,68,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(70,72,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(74,77,100,1.0e-3)<<std::endl;
+    std::cout<<bisection(77,78,100,1.0e-3)<<std::endl;    
+  */
+
+  double h = 0.1;
+  double lim = 80;
+  double N = lim/h;
+  double lambda = 0;
+  std::ofstream datos;
+
+  datos.open("datos_b.dat");
   
+  for(int ii = 0; ii < N; ii++ ){
+    lambda=0.0+ii*h;
+    datos<<lambda<<"  " << f_lambda(lambda) <<std::endl;
+  }
+
+  datos.close();
   return 0;
 }
 
@@ -106,7 +141,6 @@ double bisection(double a, double b, int N_MAX, double eps){
 double f_lambda(double lambda){
 //--------------------{R(0) ,R'(0)}
   std::vector<double> x {1.0  , 0.0};
-  std::vector<double> x_tmp = x;
   //paso de r
   const double h = 0.01;
   double r;
@@ -116,23 +150,15 @@ double f_lambda(double lambda){
   //numero de pasos del radio
   int N = Lim/h;
 
-  //limite superior de LAMBDA
-  double Lima=lambda;
-  
-  //numero de pasos del radio
-  int Na = Lima/h;
-  
   //Argumentos del sistema-----{LAMBDA}
-  std::vector<double>argumentos{0.01};
+  std::vector<double>argumentos{lambda};
   
-  for(int ii = 0; ii<Na;ii++){
-    x_tmp = x;
-    argumentos[0]=0.0+ii*h;
-    for(int step = 0; step < N; ++step){
-      r = 0.01 + step*h;
-      runge(x_tmp,argumentos, r, h);
-    }
+  
+  for(int step = 0; step < N; ++step){
+    r = 0.01 + step*h;
+    runge(x,argumentos, r, h);
+    
   }
-  double value= x_tmp[0];
+  double value= x[0];
   return value;  
 }
