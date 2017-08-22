@@ -1,4 +1,4 @@
-GCC  = g++
+GCC  = g++ -std=c++11
 FLAGS= -fsanitize=undefined -fsanitize=address -fsanitize=leak
 
 clean:
