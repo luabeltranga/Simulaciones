@@ -2,13 +2,14 @@
 #include <cmath>
 #include "Vector.h"
 
-const double GM=1;
+const double GM=1.0;
+const int N=2;
+
 const double ZETA=0.1786178958448091;
 const double LAMBDA=-0.2123418310626054;
 const double CHI=-0.06626458266981849;
 
 class Cuerpo;
-
 
 class Cuerpo{
 private:
