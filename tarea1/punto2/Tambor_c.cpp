@@ -3,10 +3,12 @@
 #include<fstream>
 #include<cmath>
 
+const double ERR=1.0e-7;
+
 double f(const std::vector<double> & x,std::vector<double> & arg, double t, const int index);
 void runge(std::vector<double> & x, const std::vector<double> & arg, double t, double h);
 double f_lambda(double lambda);
-double bisection(double a, double b, int N_MAX, double eps);
+double bisection(double a, double b);
 void roots_lambda(std::vector<double> & roots, double & lambda);
 void plot_functions(const std::vector<double> & roots);
 
@@ -14,7 +16,7 @@ void plot_functions(const std::vector<double> & roots);
 int main(void)
 {
   //-----------guarda los primeros 25 valores de lambda para los cuales f(r=5)=0
-  std::vector<double> roots (25);
+  std::vector<double> roots (5);
   double r = 5;
   //----------toma las raices de j_0(lambda) y las divide entre 5
   roots_lambda(roots,r);
@@ -90,21 +92,22 @@ void runge(std::vector<double> & x, const std::vector<double> & arg, double t, d
 
 //metodo de biseccion
 
-double bisection(double a, double b, int N_MAX, double eps){
-  double r;
-  for(int ii = 1; ii<=N_MAX; ii++){
-    r=0.5*(a+b);
-    if(std::fabs(a-b)<eps){
-      break;
-    }
-    else if(f_lambda(a)*f_lambda(r)>0){
-      a=r;
-    }
-    else{
-      b=r;
-    }
-  }
-  return r;
+double bisection(double a,double b){
+  double m;
+  double fa,fm;
+  //ENTRADA DE DATOS
+  fa=f_lambda(a);
+  //PROCESAMIENTO
+  do{ //repita
+  // calcule m; calcule fm;
+    m=(a+b)/2; fm=f_lambda(m);
+    if(fa*fm<0)// if(fa y fm tienen signos opuestos)
+      {b=m;} //corra b;
+  else
+    {a=m;fa=fm;}//corra a;
+  } while(b-a>ERR);//hasta lograr la precision deseada
+  //SALIDA DE DATOS
+  return (a+b)/2;
 }
 
 //funcion que calcula el valor de f(lambda*r) con r=1
@@ -147,17 +150,17 @@ double f_lambda(double lambda){
 //que se encontro en el punto b
 void roots_lambda(std::vector<double> & roots,double & lambda){
   std::cout<<"comenze con roots"<<std::endl;
-  roots[0]=bisection(2,3,100,1.0e-4)/lambda;
+  roots[0]=bisection(2,3)/lambda;
   std::cout<<roots[0]<<std::endl;
-  roots[1]=bisection(5,6,100,1.0e-4)/lambda;
+  roots[1]=bisection(5,5.5)/lambda;
   std::cout<<roots[1]<<std::endl;
-  std::cout<<"comenze con roots"<<std::endl;
-  roots[2]=bisection(8,9,100,1.0e-3)/lambda;
-  std::cout<<"comenze con roots"<<std::endl;
-  roots[3]=bisection(11,12,100,1.0e-3)/lambda;
-  std::cout<<"comenze con roots"<<std::endl;
-  roots[4]=bisection(14,15,100,1.0e-3)/lambda;
-  std::cout<<"comenze con roots"<<std::endl;
+  roots[2]=bisection(8.5,9)/lambda;
+  std::cout<<roots[2]<<std::endl;
+  roots[3]=bisection(11.5,12)/lambda;
+  std::cout<<roots[3]<<std::endl;
+  roots[4]=bisection(14.5,15)/lambda;
+  std::cout<<roots[4]<<std::endl;
+  /*std::cout<<"comenze con roots"<<std::endl;
   roots[5]=bisection(17,19,100,1.0e-3)/lambda;
   std::cout<<"comenze con roots"<<std::endl;
   roots[6]=bisection(20,22,100,1.0e-3)/lambda;
@@ -198,7 +201,7 @@ void roots_lambda(std::vector<double> & roots,double & lambda){
   std::cout<<"comenze con roots"<<std::endl;
   roots[24]=bisection(77,78,100,1.0e-3)/lambda;    
   std::cout<<"termine roots"<<std::endl;
-  
+  */
 }
   
       
@@ -209,7 +212,7 @@ void plot_functions(const std::vector<double> & roots){
   const double h = 0.01;
   double r;
   //limite superior del radio
-  double Lim= 5;
+  double Lim= 5.0;
   
   //numero de pasos del radio
   int N = Lim/h;
@@ -223,7 +226,7 @@ void plot_functions(const std::vector<double> & roots){
   std::ofstream curvas;
   curvas.open("Tambor.dat");
 
-  for(int jj=0;jj<25;jj++){
+  for(int jj=0;jj<5;jj++){
     x_tmp2[2*jj]=x[0];
     x_tmp2[2*jj+1]=x[1];
   }
@@ -234,7 +237,7 @@ void plot_functions(const std::vector<double> & roots){
     r = 0.01 + step*h;
     curvas<<r<<"  ";
     
-    for(int ii = 0; ii<25;ii++){
+    for(int ii = 0; ii<5;ii++){
       x_tmp[0]=x_tmp2[2*ii];
       x_tmp[1]=x_tmp2[2*ii+1];
     
