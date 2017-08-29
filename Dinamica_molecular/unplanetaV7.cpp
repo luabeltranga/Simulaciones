@@ -108,7 +108,7 @@ int main(void){
   Cuerpo Planeta[N]; 
   Colisionador Newton;
   
-  double m0=1047,m1=1,r=100;
+  double m0=4,m1=1,r=100;
 
   double R0=10, R1=5;
 
