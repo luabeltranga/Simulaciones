@@ -2,8 +2,9 @@
 #include <cmath>
 #include "Vector.h"
 
+const double K=1.0e4;
 const double g=9.8;
-const int N=1;
+const int N=2;
 
 const double ZETA=0.1786178958448091;
 const double LAMBDA=-0.2123418310626054;
@@ -59,8 +60,8 @@ void Cuerpo::Dibujese(void){
 //------------------Funciones Globales---------
 
 void InicieAnimacion(void){
-  std::cout<<"set terminal gif animate"<<std::endl;
-  std::cout<<"set output 'planeta.gif'"<<std::endl;
+  // std::cout<<"set terminal gif animate"<<std::endl;
+  //std::cout<<"set output 'planeta.gif'"<<std::endl;
   std::cout<<"unset key"<<std::endl;
   std::cout<<"set size ratio -1"<<std::endl;
   std::cout<<"set xrange [-12:22]"<<std::endl;
@@ -124,6 +125,7 @@ int main(void){
   InicieAnimacion(); Ndibujos=500;
   //---------------(theta0, omega0, m0, R0, L0, x0corrido);
   Pendulo[0].Inicie(theta0, 0     , m0, R0, L0, x0corrido);
+  Pendulo[1].Inicie(theta0, 0     , m0, R0, L0, x0corrido+5);
   /*Pendulo[1].Inicie(x1, 0, 0, 0, Vy1,0, m1, R1);
   Pendulo[2].Inicie(x1*0.5, 0, 0, 0, Vy1,0, m1, R1);
   Pendulo[3].Inicie(x1*1.5, 0, 0, 0, Vy1,0, m1, R1);

@@ -5,7 +5,7 @@
 
 const double K=1.0e6;
 const double Lx=100, Ly=100;
-const int Nx=10,Ny=10,N=Nx*Ny;
+const int Nx=5,Ny=5,N=Nx*Ny;
 
 const double ZETA=0.1786178958448091;
 const double LAMBDA=-0.2123418310626054;
