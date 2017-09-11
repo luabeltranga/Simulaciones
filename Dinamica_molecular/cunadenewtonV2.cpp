@@ -4,7 +4,7 @@
 
 const double K=1.0e9;
 const double g=9.8;
-const int N=3;
+const int N=2;
 
 const double ZETA=0.1786178958448091;
 const double LAMBDA=-0.2123418310626054;
@@ -16,7 +16,7 @@ class Colisionador;
 class Cuerpo{
 private:
   double tau,omega,theta,m,R,L,I,xcorrido;
-  // vector3D r,V,F;double m,R;
+  vector3D r;
 public:
   void Inicie(double theta0,double omega0, double m0,double R0,double L0,double x0corrido);
   void BorreFuerza(void);
@@ -37,6 +37,7 @@ void Cuerpo::Inicie(double theta0,double omega0, double m0,double R0,double L0,d
   L=L0;
   xcorrido=x0corrido;
   I=m*L*L;
+  r.cargue(L*std::sin(theta),L*std::cos(theta),0);
 }
 
 void Cuerpo::BorreFuerza(void){
@@ -101,12 +102,16 @@ void Colisionador:: CalculeTodasLasFuerzas(Cuerpo* Pendulo){
   
 }
 void  Colisionador::CalculeLaFuerzaEntre(Cuerpo & Pendulo1,Cuerpo & Pendulo2){
-  double r1,s,F;
-  r1=std::fabs(Pendulo1.L*std::sin(Pendulo1.theta));
-  s=r1-Pendulo2.R;
-  if(s<0){
-    F=K*std::pow(-s,1.5);
-    Pendulo1.AgregueFuerza(F*(-1));Pendulo2.AgregueFuerza(F);
+  vector3D F2, dr, r_unitario; double Normadr,s;
+  double tau;
+  dr=Pendulo2.r-Pendulo1.r; Normadr=norma(dr);r_unitario=dr/Normadr;
+  s=(Pendulo1.R+Pendulo2.R)-Normadr;
+  
+  if(s>0){//si se chocan
+    F2=r_unitario*(K*std::pow(s,1.5));
+    tau=norma(F2);
+    Pendulo1.AgregueFuerza(-tau*Pendulo1.L);   Pendulo2.AgregueFuerza(-tau*Pendulo1.L);
+    
   }
 }
 
@@ -133,7 +138,7 @@ int main(void){
   //---------------(theta0, omega0, m0, R0, L0, x0corrido);
   Pendulo[0].Inicie(theta0, 0     , m0, R0, L0, 0);
   for(int ii =1; ii<N;ii++){
-    Pendulo[ii].Inicie(0, 0     , m0, R0, L0, x0corrido);
+    Pendulo[ii].Inicie(theta0, 0     , m0, R0, L0, x0corrido*ii);
   }
   
   Newton.CalculeTodasLasFuerzas(Pendulo);
