@@ -3,7 +3,8 @@
 #include "Vector.h"
 
 const double G=1.0;
-const int N=4;
+const int N=3;
+const double dt=0.1;
 
 const double ZETA=0.1786178958448091;
 const double LAMBDA=-0.2123418310626054;
@@ -22,8 +23,12 @@ public:
   void Mueva_r(double dt,double Constante);
   void Mueva_V(double dt,double Constante);
   void Dibujese(void);
+  void Dibujese_Rotado(double t);
+  void Datos_Rotado(double t);
   double Getx(void){return r.x();};
   double Gety(void){return r.y();};
+  double GetVx(void){return V.x();};
+  double GetVy(void){return V.y();};
   friend class Colisionador;
 };
 
@@ -48,19 +53,30 @@ r+=V*(Constante*dt);
 void Cuerpo::Mueva_V(double dt,double Constante){
 V+=F*(Constante*dt)/m;
 }
-
 void Cuerpo::Dibujese(void){
   std::cout<<", "<<r.x()<<"+"<<R<<"*cos(t),"<<r.y()<<"+"<<R<<"*sin(t)";
+}
+void Cuerpo::Dibujese_Rotado(double t){
+  double theta = norma(V)*t/norma(r);
+  double rx_rotado = r.x()*std::cos(theta)+r.y()*std::sin(theta);
+  double ry_rotado = -r.y()*std::cos(theta)+r.x()*std::sin(theta);
+  std::cout<<", "<<rx_rotado<<"+"<<R<<"*cos(t),"<<ry_rotado<<"+"<<R<<"*sin(t)";
+}
+void Cuerpo::Datos_Rotado(double t){
+  double theta = norma(V)*t/norma(r);
+  double rx_rotado = r.x()*std::cos(theta)+r.y()*std::sin(theta);
+  double ry_rotado = -r.y()*std::cos(theta)+r.x()*std::sin(theta);
+  std::cout<<rx_rotado<<"    "<<ry_rotado<<"    ";
 }
 //------------------Funciones Globales---------
 
 void InicieAnimacion(void){
-  //std::cout<<"set terminal gif animate"<<std::endl;
-  //std::cout<<"set output 'planeta.gif'"<<std::endl;
+  //std::cout<<"set terminal pdf enhanced"<<std::endl;
+  //std::cout<<"set output 'planeta.pdf'"<<std::endl;
   std::cout<<"unset key"<<std::endl;
   std::cout<<"set size ratio -1"<<std::endl;
-  std::cout<<"set xrange [-200:200]"<<std::endl;
-  std::cout<<"set yrange [-200:200]"<<std::endl;
+  std::cout<<"set xrange [-2000:2000]"<<std::endl;
+  std::cout<<"set yrange [-2000:2000]"<<std::endl;
   std::cout<<"set parametric"<<std::endl;
   std::cout<<"set trange[0:7]"<<std::endl;
   std::cout<<"set isosamples 12"<<std::endl;
@@ -86,7 +102,7 @@ void Colisionador:: CalculeTodasLasFuerzas(Cuerpo* Planeta){
   //Borrar todas las fuerzas
   for(int ii = 0;ii<N;ii++) Planeta[ii].BorreFuerza();
   for(int ii =0;ii<N;ii++){
-    for(int jj =0;jj<ii;jj++){
+    for(int jj =ii+1;jj<N;jj++){
       CalculeLaFuerzaEntre(Planeta[ii],Planeta[jj]);
     }
   }
@@ -103,37 +119,46 @@ void  Colisionador::CalculeLaFuerzaEntre(Cuerpo & Planeta1,Cuerpo & Planeta2){
 
 int main(void){
   
-  double t, dt=0.01;
+  double t;
   double tdibujo;int Ndibujos;
   Cuerpo Planeta[N]; 
   Colisionador Newton;
-  
-  double m0=1047,m1=1,r=100;
+  //masa sol
+  double m0=1047;
+  //masa jupiter
+  double m1=1;
+  //masa troyano
+  double m2 = 0.005;
+  //distancia entre el sol y jupiter
+  double r=1000;
 
-  double R0=10, R1=5;
+  double R0=100, R1=50, R2=50;
 
-  double M=m0+m1;
+  double M=m0+m1+m2;
 
-  double x0=-(m1/M)*r, x1=x0+r;
+  double x0=-(m1/M)*r, x1=r+x0;
 
-  double omega=std::sqrt(G*M/(r*r*r)), Vy0=omega*x0, Vy1=omega*x1, T=2*M_PI/omega, tmax=1.1*T;  
+  double omega=std::sqrt(G*M/(r*r*r)), Vy0=omega*x0, Vy1=omega*x1, T=2*M_PI/omega, tmax=25*T;  
 
-  InicieAnimacion(); Ndibujos=500;
+  //InicieAnimacion(); Ndibujos=500;
   //-----(x0, y0, Vx0, Vy0, m0, R0);
   Planeta[0].Inicie(x0, 0, 0, 0, Vy0,0, m0, R0);
   Planeta[1].Inicie(x1, 0, 0, 0, Vy1,0, m1, R1);
-  Planeta[2].Inicie(x1*0.5, 0, 0, 0, Vy1,0, m1, R1);
-  Planeta[3].Inicie(x1*1.5, 0, 0, 0, Vy1,0, m1, R1);
+  Planeta[2].Inicie(std::cos(M_PI/3)*x1, -std::sin(M_PI/3)*x1, 0, std::sin(M_PI/3)*Vy1, std::cos(M_PI/3)*Vy1,0, m2, R2);
+
   Newton.CalculeTodasLasFuerzas(Planeta);
   for(t=tdibujo=0;t<tmax;t+=dt,tdibujo+=dt){
     if(tdibujo<tmax/Ndibujos){
-      InicieCuadro();
-      for(int ii = 0;ii<N;ii++)Planeta[ii].Dibujese();
+      //InicieCuadro();
+      //for(int ii = 0;ii<N;ii++)Planeta[ii].Dibujese_Rotado(t);
+      for(int ii = 0;ii<N;ii++)Planeta[ii].Datos_Rotado(t);
       TermineCuadro();
       tdibujo=0;
     }
     
-
+    //    double r=std::pow(Planeta[1].Getx(),2)+std::pow(Planeta[1].Gety(),2);
+    //double V=std::pow(Planeta[1].GetVx(),2)+std::pow(Planeta[1].GetVy(),2);
+    //std::cout<<omega*omega<<"  "<<V/r<<std::endl;
     
     //std::cout<<Planeta[0].Getx()<<"   "<<Planeta[0].Gety()<<std::endl;
     for(int ii = 0;ii<N;ii++)Planeta[ii].Mueva_r(dt,ZETA);
