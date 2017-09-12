@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include "Vector.h"
-#include <random>
+#include "Random64.h"
 
 const double K=1.0e6;
 const double Lx=100, Ly=100;
@@ -90,7 +90,7 @@ public:
 
 void Colisionador:: CalculeTodasLasFuerzas(Cuerpo* Grano){
   //Borrar todas las fuerzas
-  for(int ii = 0;ii<N;ii++) Grano[ii].BorreFuerza();
+  for(int ii = 0;ii<N+4;ii++) Grano[ii].BorreFuerza();
   for(int ii =0;ii<N;ii++){
     for(int jj =ii+1;jj<N+4;jj++){
       CalculeLaFuerzaEntre(Grano[ii],Grano[jj]);
@@ -111,19 +111,18 @@ void  Colisionador::CalculeLaFuerzaEntre(Cuerpo & Grano1,Cuerpo & Grano2){
 
 
 int main(void){
-  std::mt19937 gen(10);
-  std::uniform_real_distribution<> dis(0,2*M_PI);
-  double t, dt=1.0e-4;
+  double t, dt=1.0e-3;
   double tdibujo;int Ndibujos;
   Cuerpo Grano[N+4]; 
   Colisionador Newton;
-  
-  double m0=1, R0=3,V=1000;
+  Crandom ran64(1);double theta;
+    
+  double m0=1, R0=3,V=10;
   double Rpared=10000,Mpared=1000*m0;
-  double dx=Lx/(Nx+1);
-  double T=Lx/V, tmax=25*T;
+  double dx=Lx/(Nx+1);double dy=Ly/(Ny+1);
+  double T=Lx/V, tmax=5*T;
 
-  InicieAnimacion(); Ndibujos=500;
+  InicieAnimacion(); Ndibujos=2000;
   //PAREDES
   //---------------(x0       , y0      ,z0 , Vx0, Vy0,Vz0 , m0    , R0);
   //Pared arriba
@@ -139,7 +138,8 @@ int main(void){
   //-------------(x0  , y0  ,z0, Vx0  , Vy0 , m0    , R0);
   for(int ii=0;ii<Nx;ii++){
     for(int jj=0;jj<Ny;jj++){
-      Grano[ii+Nx*jj].Inicie((ii+1)*dx, (jj+1)*dx, 0, V*std::cos(dis(gen)),V*std::sin(dis(gen)),0, m0, R0);
+      theta=2*M_PI*ran64.r();
+      Grano[ii+Nx*jj].Inicie((ii+1)*dx, (jj+1)*dy, 0, V*std::cos(theta),V*std::sin(theta),0, m0, R0);
     }
   }
   Newton.CalculeTodasLasFuerzas(Grano);

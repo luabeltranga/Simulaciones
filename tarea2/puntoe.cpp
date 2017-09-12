@@ -66,7 +66,7 @@ void Cuerpo::Datos_Rotado(double t, double omega){
   double theta=omega*t;
   double rx_rotado = r.x()*std::cos(theta)+r.y()*std::sin(theta);
   double ry_rotado = -r.y()*std::cos(theta)+r.x()*std::sin(theta);
-  std::cout<<rx_rotado<<"    "<<ry_rotado<<"    ";
+  std::cout<<t<<"    "<<rx_rotado<<"    ";
 }
 //------------------Funciones Globales---------
 
@@ -138,7 +138,7 @@ int main(void){
 
   double x0=-(m1/M)*r, x1=r+x0;
 
-  double omega=std::sqrt(G*M/(r*r*r)), Vy0=omega*x0, Vy1=omega*x1, T=2*M_PI/omega, tmax=5*T;  
+  double omega=std::sqrt(G*M/(r*r*r)), Vy0=omega*x0, Vy1=omega*x1, T=2*M_PI/omega, tmax=20*T;  
 
   //InicieAnimacion(); Ndibujos=500;
   //-----(x0, y0, Vx0, Vy0, m0, R0);
