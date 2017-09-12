@@ -5,22 +5,6 @@ const double g=9.795;
 
 class Cuerpo;
 
-int main(void){
-  double t; double dt=0.01;
-  Cuerpo Balon;
-
-  //-----(x0, y0, Vx0, Vy0, m0, R0);
-  Balon.Inicie(0, 0, 12, 16, 0.457, 0.15);
-
-  for(t=0;t<3.5;t+=dt){
-    std::cout<<Balon.Getx()<<" "<<Balon.Gety()<<std::endl;
-    Balon.CalculeFuerza();
-    Balon.Muevase(dt);
-  }
-  
-  return 0;
-}
-
 class Cuerpo{
 private:
   double x,y,Vx,Vy,Fx,Fy,m,R;
@@ -51,6 +35,22 @@ void Cuerpo::Muevase(double dt){
   y+=Vy*dt;
   Vx+=Fx*dt/m;
   Vy+=Fy*dt/m;
+}
+
+int main(void){
+  double t; double dt=0.01;
+  Cuerpo Balon;
+
+  //-----(x0, y0, Vx0, Vy0, m0, R0);
+  Balon.Inicie(0, 0, 12, 16, 0.457, 0.15);
+
+  for(t=0;t<3.5;t+=dt){
+    std::cout<<Balon.Getx()<<" "<<Balon.Gety()<<std::endl;
+    Balon.CalculeFuerza();
+    Balon.Muevase(dt);
+  }
+  
+  return 0;
 }
 
 

@@ -2,9 +2,9 @@
 #include <cmath>
 #include "Vector.h"
 
-const double K=1.0e9;
+const double K=1.0e4;
 const double g=9.8;
-const int N=2;
+const int N=3;
 
 const double ZETA=0.1786178958448091;
 const double LAMBDA=-0.2123418310626054;
@@ -16,7 +16,6 @@ class Colisionador;
 class Cuerpo{
 private:
   double tau,omega,theta,m,R,L,I,xcorrido;
-  vector3D r;
 public:
   void Inicie(double theta0,double omega0, double m0,double R0,double L0,double x0corrido);
   void BorreFuerza(void);
@@ -30,14 +29,14 @@ public:
 };
 
 void Cuerpo::Inicie(double theta0,double omega0, double m0,double R0,double L0,double x0corrido){
-  omega =omega0;
+  omega=omega0;
   theta=theta0;
   m=m0;
   R=R0;
   L=L0;
   xcorrido=x0corrido;
   I=m*L*L;
-  r.cargue(L*std::sin(theta),L*std::cos(theta),0);
+  
 }
 
 void Cuerpo::BorreFuerza(void){
@@ -102,16 +101,19 @@ void Colisionador:: CalculeTodasLasFuerzas(Cuerpo* Pendulo){
   
 }
 void  Colisionador::CalculeLaFuerzaEntre(Cuerpo & Pendulo1,Cuerpo & Pendulo2){
-  vector3D F2, dr, r_unitario; double Normadr,s;
-  double tau;
-  dr=Pendulo2.r-Pendulo1.r; Normadr=norma(dr);r_unitario=dr/Normadr;
-  s=(Pendulo1.R+Pendulo2.R)-Normadr;
+  vector3D r[2];
+  double L=Pendulo1.L;
   
-  if(s>0){//si se chocan
-    F2=r_unitario*(K*std::pow(s,1.5));
-    tau=norma(F2);
-    Pendulo1.AgregueFuerza(-tau*Pendulo1.L);   Pendulo2.AgregueFuerza(-tau*Pendulo1.L);
+  r[0].cargue(L*std::sin(Pendulo1.theta)+Pendulo1.xcorrido,-L*std::cos(Pendulo1.theta),0);
+  r[1].cargue(L*std::sin(Pendulo2.theta)+Pendulo2.xcorrido,-L*std::cos(Pendulo2.theta),0);
     
+  double r12=norma(r[0]-r[1]);
+  double s = (Pendulo2.xcorrido-Pendulo1.xcorrido)-r12;
+  double F;
+  if(s>0){
+    F=K*std::pow(s,1.5);
+    Pendulo1.AgregueFuerza(-F*Pendulo1.L);
+    Pendulo2.AgregueFuerza(F*Pendulo1.L);
   }
 }
 
@@ -132,13 +134,13 @@ int main(void){
 
   double theta0=-15*M_PI/180;
 
-  double T= 2*M_PI*std::sqrt(L0/g), tmax=2*T;
+  double T= 2*M_PI*std::sqrt(L0/g), tmax=10*T;
 
-  InicieAnimacion(); Ndibujos=500;
+  InicieAnimacion(); Ndibujos=2000;
   //---------------(theta0, omega0, m0, R0, L0, x0corrido);
   Pendulo[0].Inicie(theta0, 0     , m0, R0, L0, 0);
   for(int ii =1; ii<N;ii++){
-    Pendulo[ii].Inicie(theta0, 0     , m0, R0, L0, x0corrido*ii);
+    Pendulo[ii].Inicie(0, 0     , m0, R0, L0, x0corrido*ii);
   }
   
   Newton.CalculeTodasLasFuerzas(Pendulo);

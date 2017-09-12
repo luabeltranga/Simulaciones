@@ -55,8 +55,8 @@ void Cuerpo::Dibujese(void){
 //------------------Funciones Globales---------
 
 void InicieAnimacion(void){
-  std::cout<<"set terminal gif animate"<<std::endl;
-  std::cout<<"set output 'planeta.gif'"<<std::endl;
+  //std::cout<<"set terminal gif animate"<<std::endl;
+  //std::cout<<"set output 'planeta.gif'"<<std::endl;
   std::cout<<"unset key"<<std::endl;
   std::cout<<"set size ratio -1"<<std::endl;
   std::cout<<"set xrange [-200:200]"<<std::endl;
