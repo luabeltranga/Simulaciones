@@ -156,11 +156,6 @@ int main(void){
       tdibujo=0;
     }
     
-    //double r=std::pow(Planeta[1].Getx(),2)+std::pow(Planeta[1].Gety(),2);
-    //double V=std::pow(Planeta[1].GetVx(),2)+std::pow(Planeta[1].GetVy(),2);
-    //std::cout<<omega*omega<<"  "<<V/r<<std::endl;
-    
-    //std::cout<<Planeta[0].Getx()<<"   "<<Planeta[0].Gety()<<std::endl;
     for(int ii = 0;ii<N;ii++)Planeta[ii].Mueva_r(dt,ZETA);
     Newton.CalculeTodasLasFuerzas(Planeta);
     for(int ii = 0;ii<N;ii++)Planeta[ii].Mueva_V(dt,(1-2*LAMBDA)/2);

@@ -24,6 +24,7 @@ public:
   void Mueva_V(double dt,double Constante);
   void Dibujese(void);
   void Dibujese_Rotado(double t);
+  void Datos_Rotado(double t, double omega);
   double Getx(void){return r.x();};
   double Gety(void){return r.y();};
   double GetVx(void){return V.x();};
@@ -60,6 +61,12 @@ void Cuerpo::Dibujese_Rotado(double t){
   double rx_rotado = r.x()*std::cos(theta)+r.y()*std::sin(theta);
   double ry_rotado = -r.y()*std::cos(theta)+r.x()*std::sin(theta);
   std::cout<<", "<<rx_rotado<<"+"<<R<<"*cos(t),"<<ry_rotado<<"+"<<R<<"*sin(t)";
+}
+void Cuerpo::Datos_Rotado(double t, double omega){
+  double theta=omega*t;
+  double rx_rotado = r.x()*std::cos(theta)+r.y()*std::sin(theta);
+  double ry_rotado = -r.y()*std::cos(theta)+r.x()*std::sin(theta);
+  std::cout<<rx_rotado<<"    "<<ry_rotado<<"    ";
 }
 //------------------Funciones Globales---------
 
@@ -133,19 +140,15 @@ int main(void){
   Planeta[1].Inicie(x1, 0, 0, 0, Vy1,0, m1, R1);
   Newton.CalculeTodasLasFuerzas(Planeta);
   for(t=tdibujo=0;t<tmax;t+=dt,tdibujo+=dt){
-      if(tdibujo<tmax/Ndibujos){
-      InicieCuadro();
-      for(int ii = 0;ii<N;ii++)Planeta[ii].Dibujese_Rotado(t);
+    if(tdibujo<tmax/Ndibujos){
+      //InicieCuadro();
+      //for(int ii = 0;ii<N;ii++)Planeta[ii].Dibujese_Rotado(t);
+      for(int ii = 0;ii<N;ii++)Planeta[ii].Datos_Rotado(t,omega);
       TermineCuadro();
       tdibujo=0;
     }
-  
-    //    double r=std::pow(Planeta[1].Getx(),2)+std::pow(Planeta[1].Gety(),2);
-    //double V=std::pow(Planeta[1].GetVx(),2)+std::pow(Planeta[1].GetVy(),2);
-    //std::cout<<omega*omega<<"  "<<V/r<<std::endl;
-  
-    //std::cout<<Planeta[0].Getx()<<"   "<<Planeta[0].Gety()<<std::endl;
-  for(int ii = 0;ii<N;ii++)Planeta[ii].Mueva_r(dt,ZETA);
+    
+    for(int ii = 0;ii<N;ii++)Planeta[ii].Mueva_r(dt,ZETA);
     Newton.CalculeTodasLasFuerzas(Planeta);
     for(int ii = 0;ii<N;ii++)Planeta[ii].Mueva_V(dt,(1-2*LAMBDA)/2);
     for(int ii = 0;ii<N;ii++)Planeta[ii].Mueva_r(dt,CHI);

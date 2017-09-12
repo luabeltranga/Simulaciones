@@ -16,7 +16,6 @@ class Colisionador;
 class Cuerpo{
 private:
   double tau,omega,theta,m,R,L,I,xcorrido;
-  vector3D r;
 public:
   void Inicie(double theta0,double omega0, double m0,double R0,double L0,double x0corrido);
   void BorreFuerza(void);
@@ -37,7 +36,7 @@ void Cuerpo::Inicie(double theta0,double omega0, double m0,double R0,double L0,d
   L=L0;
   xcorrido=x0corrido;
   I=m*L*L;
-  r.cargue(L*std::sin(theta),-L*std::cos(theta),0);
+  
 }
 
 void Cuerpo::BorreFuerza(void){
@@ -102,7 +101,13 @@ void Colisionador:: CalculeTodasLasFuerzas(Cuerpo* Pendulo){
   
 }
 void  Colisionador::CalculeLaFuerzaEntre(Cuerpo & Pendulo1,Cuerpo & Pendulo2){
-  double r12=norma(Pendulo1.r-Pendulo2.r);
+  vector3D r[2];
+  double L=Pendulo1.L;
+  
+  r[0].cargue(L*std::sin(Pendulo1.theta)+Pendulo1.xcorrido,-L*std::cos(Pendulo1.theta),0);
+  r[1].cargue(L*std::sin(Pendulo2.theta)+Pendulo2.xcorrido,-L*std::cos(Pendulo2.theta),0);
+    
+  double r12=norma(r[0]-r[1]);
   double s = Pendulo1.xcorrido-r12;
   double F;
   if(s>0){
