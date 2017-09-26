@@ -100,7 +100,7 @@ void TermineCuadro(void){
 
 class Colisionador{
 private:
-  vector3D ele[N+4][N+4];bool EstabaEnColision[N+4][N+4];
+  vector3D ele[(N+4)*(N+4)];bool EstabaEnColision[(N+4)*(N+4)];
   
 public:
   void Inicie(void);
@@ -112,7 +112,7 @@ public:
 void Colisionador:: Inicie(void){
   for(int ii=0;ii<N+4;ii++){
     for(int jj=ii+1;jj<N+4;jj++){
-      ele[ii][jj].cargue(0,0,0); EstabaEnColision[ii][jj]=false;
+      ele[ii*(N+4)+jj].cargue(0,0,0); EstabaEnColision[ii*(N+4)+jj]=false;
     }
   }
 }
@@ -128,7 +128,7 @@ void Colisionador:: CalculeTodasLasFuerzas(Cuerpo* Grano,double dt){
   //Fuerza entre pares de bolas
   for(int ii =0;ii<N;ii++){
     for(int jj =ii+1;jj<N+4;jj++){
-      CalculeLaFuerzaEntre(Grano[ii],Grano[jj],ele[ii][jj],EstabaEnColision[ii][jj],dt);
+      CalculeLaFuerzaEntre(Grano[ii],Grano[jj],ele[ii*(N+4)+jj],EstabaEnColision[ii*(N+4)+jj],dt);
     }
   }
 }
@@ -187,7 +187,7 @@ int main(void){
   Colisionador Newton;
   Crandom ran64(1);double theta;
     
-  double m0=1, R0=6,V=0,omega0=100;
+  double m0=1, R0=6,V=0,omega0=10;
   double Rpared=10000,Mpared=1000*m0;
   double dx=Lx/(Nx+1);double dy=Ly/(Ny+1);
   double T=10, tmax=3*T;

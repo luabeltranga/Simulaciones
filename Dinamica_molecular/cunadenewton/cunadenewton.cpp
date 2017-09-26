@@ -132,7 +132,7 @@ int main(void){
 
   double x0corrido=2*R0;
 
-  double theta0=-15*M_PI/180;
+  double theta0=-45*M_PI/180;
 
   double T= 2*M_PI*std::sqrt(L0/g), tmax=2*T;
 
