@@ -5,7 +5,7 @@
 
 const double K=1.0e6;
 const double Lx=100, Ly=100;
-const int Nx=5,Ny=5,N=Nx*Ny;
+const int Nx=10,Ny=10,N=Nx*Ny;
 
 const double ZETA=0.1786178958448091;
 const double LAMBDA=-0.2123418310626054;
@@ -26,6 +26,8 @@ public:
   void Dibujese(void);
   double Getx(void){return r.x();};
   double Gety(void){return r.y();};
+  double GetVx(void){return V.x();};
+  double GetV(void){return norma(V);};
   friend class Colisionador;
 };
 
@@ -120,9 +122,10 @@ int main(void){
   double m0=1, R0=3,V=10;
   double Rpared=10000,Mpared=1000*m0;
   double dx=Lx/(Nx+1);double dy=Ly/(Ny+1);
-  double T=Lx/V, tmax=5*T;
+  double T=Lx/V, tmax=10*T;
 
-  InicieAnimacion(); Ndibujos=2000;
+  //InicieAnimacion();
+  Ndibujos=2000;
   //PAREDES
   //---------------(x0       , y0      ,z0 , Vx0, Vy0,Vz0 , m0    , R0);
   //Pared arriba
@@ -144,13 +147,13 @@ int main(void){
   }
   Newton.CalculeTodasLasFuerzas(Grano);
   for(t=tdibujo=0;t<tmax;t+=dt,tdibujo+=dt){
-    if(tdibujo<tmax/Ndibujos){
+    /*if(tdibujo<tmax/Ndibujos){
       InicieCuadro();
       for(int ii = 0;ii<N;ii++)Grano[ii].Dibujese();
       TermineCuadro();
       tdibujo=0;
-    }
-    
+     }
+    */
 
     
     //std::cout<<Grano[0].Getx()<<"   "<<Grano[0].Gety()<<std::endl;
@@ -168,7 +171,7 @@ int main(void){
     for(int ii = 0;ii<N;ii++)Grano[ii].Mueva_V(dt,(1-2*LAMBDA)/2);
     for(int ii = 0;ii<N;ii++)Grano[ii].Mueva_r(dt,ZETA);
   }
-  
+  for(int ii = 0;ii<N;ii++)std::cout<<Grano[ii].GetVx()<<std::endl;
   return 0;
 }
 		    
