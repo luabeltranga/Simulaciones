@@ -9,7 +9,7 @@ const double Gamma=50;
 const double Kcundall=10;
 const double MU=0.4;
 const double Lx=100, Ly=100;
-const int Nx=5,Ny=5,N=Nx*Ny;
+const int Nx=1,Ny=5,N=Nx*Ny;
 
 
 const double ZETA=0.1786178958448091;
@@ -181,16 +181,16 @@ void  Colisionador::CalculeLaFuerzaEntre(Cuerpo & Grano1,Cuerpo & Grano2,vector3
 
 
 int main(void){
-  double t, dt=1.0e-3;
+  double t, dt=1.0e-2;
   double tdibujo;int Ndibujos;
   Cuerpo Grano[N+4]; 
   Colisionador Newton;
   Crandom ran64(1);double theta;
     
-  double m0=1, R0=6,V=10,omega0=10;
+  double m0=1, R0=6,V=0,omega0=100;
   double Rpared=10000,Mpared=1000*m0;
   double dx=Lx/(Nx+1);double dy=Ly/(Ny+1);
-  double T=Lx/V, tmax=3*T;
+  double T=10, tmax=3*T;
 
   InicieAnimacion(); Ndibujos=2000;
   //PAREDES
@@ -210,7 +210,7 @@ int main(void){
     for(int jj=0;jj<Ny;jj++){
       theta=2*M_PI*ran64.r();
       //--------------------(x0       , y0       ,z0, Vx0              , Vy0             ,Vz0, theta0, omega0, m0 , R0);
-      Grano[ii+Nx*jj].Inicie((ii+1)*dx, (jj+1)*dy, 0, V*std::cos(theta),V*std::sin(theta),0  ,0      ,omega0 , m0 , R0);
+      Grano[ii+Nx*jj].Inicie((ii+1)*dx, (jj+1)*dy, 0, V*std::cos(theta),V*std::sin(theta),0  ,0      ,theta , m0 , R0);
     }
   }
   //Newton.CalculeTodasLasFuerzas(Grano,dt);

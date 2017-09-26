@@ -4,7 +4,7 @@
 
 const double K=1.0e4;
 const double g=9.8;
-const int N=3;
+const int N=7;
 
 const double ZETA=0.1786178958448091;
 const double LAMBDA=-0.2123418310626054;
@@ -93,10 +93,10 @@ void Colisionador:: CalculeTodasLasFuerzas(Cuerpo* Pendulo){
   //Agregar fuerzas externas
   for(int ii = 0;ii<N;ii++) Pendulo[ii].AgregueFuerza(-Pendulo[ii].m*g*Pendulo[ii].L*std::sin(Pendulo[ii].theta));
   //calcular fuerza entre pares de pendulos
-  for(int ii =0;ii<N;ii++){
-    for(int jj =ii+1;jj<N;jj++){
-      CalculeLaFuerzaEntre(Pendulo[ii],Pendulo[jj]);
-    }
+  for(int ii =0;ii<N-1;ii++){
+    //for(int jj =ii+1;jj<N;jj++){
+    CalculeLaFuerzaEntre(Pendulo[ii],Pendulo[ii+1]);
+    //}
   }
   
 }
@@ -134,7 +134,7 @@ int main(void){
 
   double theta0=-15*M_PI/180;
 
-  double T= 2*M_PI*std::sqrt(L0/g), tmax=10*T;
+  double T= 2*M_PI*std::sqrt(L0/g), tmax=2*T;
 
   InicieAnimacion(); Ndibujos=2000;
   //---------------(theta0, omega0, m0, R0, L0, x0corrido);
