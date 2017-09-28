@@ -3,10 +3,7 @@
 #include "Vector.h"
 #include "Random64.h"
 
-
-
-const double Lx=100, Ly=100;
-const int Nx=1,Ny=5,N=Nx*Ny;
+const int N=5;
 
 
 const double ZETA=0.1786178958448091;
@@ -121,9 +118,9 @@ int main(void){
   Colisionador Newton;
   Crandom ran64(1);
     
-  double m0=1, R0=6,V=0,omega0=10,theta;
+  double m0=1, R0=6,V=0,theta=0;
   double dx=Lx/(Nx+1);double dy=Ly/(Ny+1);
-  double T=1, tmax=T;
+  double tmax = 10*dt;
   
   InicieAnimacion(); Ndibujos=2000;
   //GRANOS
@@ -131,7 +128,7 @@ int main(void){
   for(int ii=0;ii<Nx;ii++){
     for(int jj=0;jj<Ny;jj++){
       theta=2*M_PI*ran64.r();
-      //--------------------(x0       , y0       ,z0, Vx0              , Vy0             ,Vz0, theta0, omega0, m0 , R0);
+      //--------------------(x0       , y0       ,z0, Vx0              , Vy0             ,Vz0, m0 , R0);
       Grano[ii+Nx*jj].Inicie((ii+1)*dx, (jj+1)*dy, 0, V*std::cos(theta),V*std::sin(theta),0  , m0 , R0);
     }
   }
