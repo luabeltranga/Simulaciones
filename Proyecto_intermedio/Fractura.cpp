@@ -3,9 +3,11 @@
 #include "Vector.h"
 #include "Random64.h"
 
-const int L=4;
-const int N=(2*L+1)*(2*L+1);
+const int L=80;
+const int H=1000/(2*L);
+const int N=(2*L+1)*H;
 const double a = 50;
+const double m0=1, R0=5;
 
 
 const double ZETA=0.1786178958448091;
@@ -13,7 +15,7 @@ const double LAMBDA=-0.2123418310626054;
 const double CHI=-0.06626458266981849;
 
 class Nodos;
-class Colisionador;
+class Resortes;
 
 class Nodos{
 private:
@@ -29,7 +31,7 @@ public:
   void Dibujese(void);
   double Getx(void){return r.x();};
   double Gety(void){return r.y();};
-  friend class Colisionador;
+  friend class Resortes;
 };
 
 void Nodos::Inicie(double x0,double y0,double z0,
@@ -59,36 +61,10 @@ void Nodos::Mueva_V(double dt,double Constante){
 void Nodos::Dibujese(void){
   std::cout<<", "<<r.x()<<"+"<<R<<"*cos(t),"<<r.y()<<"+"<<R<<"*sin(t)";
 }
-//------------------Funciones Globales---------
 
-void InicieAnimacion(void){
-  //std::cout<<"set terminal gif animate"<<std::endl;
-  //std::cout<<"set output 'planeta.gif'"<<std::endl;
-  std::cout<<"unset key"<<std::endl;
-  std::cout<<"unset border"<<std::endl;
-  std::cout<<"unset xtics"<<std::endl;
-  std::cout<<"unset ytics"<<std::endl;
-  std::cout<<"set size ratio -1"<<std::endl;
-  std::cout<<"set xrange [-10:360]"<<std::endl;
-  std::cout<<"set yrange [-10:770]"<<std::endl;
-  std::cout<<"set parametric"<<std::endl;
-  std::cout<<"set trange[0:15]"<<std::endl;
-  std::cout<<"set isosamples 12"<<std::endl;
-}
-void InicieCuadro(void){
-  std::cout<<"plot 0,0 ";
-  std::cout<<" , "<<360/15<<"*t,0";
-  std::cout<<" , "<<360/15<<"*t,736";
-  std::cout<<" , 0,"<<736/15<<"*t";
-  std::cout<<" , 360,"<<736/15<<"*t";
-  
-}
-void TermineCuadro(void){
-  std::cout<<std::endl;
-}
 //-------clase colisionador-------
 
-class Colisionador{
+class Resortes{
 private:
   
 public:
@@ -98,7 +74,7 @@ public:
 };
 
 
-void Colisionador:: CalculeTodasLasFuerzas(Nodos* Nodo,double dt){
+void Resortes:: CalculeTodasLasFuerzas(Nodos* Nodo,double dt){
   
   //Borrar todas las fuerzas y torques
   for(int ii = 0;ii<N;ii++) Nodo[ii].BorreFuerza();
@@ -111,7 +87,7 @@ void Colisionador:: CalculeTodasLasFuerzas(Nodos* Nodo,double dt){
   }
   */
 }
-void  Colisionador::CalculeLaFuerzaEntre(Nodos & Nodo1,Nodos & Nodo2){
+void  Resortes::CalculeLaFuerzaEntre(Nodos & Nodo1,Nodos & Nodo2){
 
 
 }
@@ -119,42 +95,87 @@ void  Colisionador::CalculeLaFuerzaEntre(Nodos & Nodo1,Nodos & Nodo2){
 
 
 
+
+//------------------Funciones Globales---------
+
+void InicieAnimacion(void){
+  //std::cout<<"set terminal gif animate"<<std::endl;
+  //std::cout<<"set output 'planeta.gif'"<<std::endl;
+  std::cout<<"unset key"<<std::endl;
+  std::cout<<"unset border"<<std::endl;
+  std::cout<<"unset xtics"<<std::endl;
+  std::cout<<"unset ytics"<<std::endl;
+  std::cout<<"set size ratio -1"<<std::endl;
+  std::cout<<"set xrange [-10:"<< (L+2)*a<<"]"<<std::endl;
+  std::cout<<"set yrange [-10:"<<1.5*H*a<<"]"<<std::endl;
+  std::cout<<"set parametric"<<std::endl;
+  std::cout<<"set trange[0:15]"<<std::endl;
+  std::cout<<"set isosamples 12"<<std::endl;
+}
+void InicieCuadro(void){
+  std::cout<<"plot 0,0 ";
+  std::cout<<" , "<<900/15<<"*t,0";
+  std::cout<<" , "<<900/15<<"*t,2820";
+  std::cout<<" , 0,"<<2820/15<<"*t";
+  std::cout<<" , 900,"<<2820/15<<"*t";
+  
+}
+void TermineCuadro(void){
+  std::cout<<std::endl;
+}
+
+void Inicializa_malla(Nodos * Nodo){
+
+  double xran=0,yran=0;
+  double x0=0,y0=0;
+  double R=0.1*a;
+  Crandom ran64(1);
+
+  double c=0,b=0,bold=0;
+
+  for(int ii=0;ii<H;ii++){  
+    for(int jj=0;jj<L;jj++){
+      c=ran64.r();b=ran64.r();
+      if(a>b){
+	bold=b;
+	b=c;
+	c=bold;
+      }
+      x0=(jj+1+0.5)*a;  y0=(ii)*std::sqrt(3)*a;
+      xran=(b*R*std::cos(2*M_PI*c/b))+x0;yran = (b*R*std::sin(2*M_PI*c/b))+y0;
+      //------------------------(x0, y0,z0, Vx0, Vy0, Vz0, m0 , R0);
+      Nodo[ii*(2*L+1)+jj].Inicie(xran, yran, 0,   0,   0,  0 , m0 , R0);
+    }
+    for(int jj=L;jj<2*L+1;jj++){
+      c=ran64.r();b=ran64.r();
+      if(a>b){
+	bold=b;
+	b=c;
+	c=bold;
+      }
+      x0=(2*L-jj+1)*a;  y0=(ii+1-0.5)*std::sqrt(3)*a;
+      xran=(b*R*std::cos(2*M_PI*a/c))+x0;yran = (b*R*std::sin(2*M_PI*c/b))+y0;
+      //------------------------(x0, y0,z0, Vx0, Vy0, Vz0, m0 , R0);
+      Nodo[ii*(2*L+1)+jj].Inicie(xran, yran, 0,   0,   0,  0 , m0 , R0);
+    }
+  } 
+}
+
+
 int main(void){
   double t, dt=1.0e-2;
   double tdibujo;int Ndibujos;
-  double xran=0;
-  double yran=0;
   
   Nodos Nodo[N]; 
-  Colisionador Newton;
-  Crandom ran64(1);
-    
-  double m0=1, R0=5;
-  double tmax = 1000*dt;
+  Resortes Red;
+  
+  double tmax = 10*dt;
   
   InicieAnimacion();
   Ndibujos=2000;
   //Malla base triangular regular
-  
-  for(int ii=0;ii<2*L+1;ii++){  
-
-    for(int jj=0;jj<L;jj++){
-      xran=(jj+1+0.5)*a;
-      yran=(ii)*std::sqrt(3)*a;
-      
-      //------------------------(x0      , y0      ,z0, Vx0, Vy0, Vz0, m0 , R0);
-      Nodo[ii*(2*L+1)+jj].Inicie(xran, yran, 0,   0,   0,  0 , m0 , R0);
-    }
-    for(int jj=L;jj<2*L+1;jj++){
-      xran=(2*L-jj+1)*a;
-      yran=(ii+1-0.5)*std::sqrt(3)*a;
-     
-      //----------------------------(x0  , y0  ,z0, Vx0, Vy0, Vz0, m0 , R0);
-      Nodo[ii*(2*L+1)+jj].Inicie(xran, yran, 0,   0,   0,  0 , m0 , R0);
-    }
-  }
-
-  
+  Inicializa_malla(Nodo);
+    
   for(t=tdibujo=0;t<tmax;t+=dt,tdibujo+=dt){
 
     
@@ -169,16 +190,16 @@ int main(void){
     
     //std::cout<<Nodo[8].Getx()<<"   "<<Nodo[8].Gety()<<std::endl;
     for(int ii = 0;ii<N;ii++)Nodo[ii].Mueva_r(dt,ZETA);
-    Newton.CalculeTodasLasFuerzas(Nodo,dt);
+    Red.CalculeTodasLasFuerzas(Nodo,dt);
     for(int ii = 0;ii<N;ii++)Nodo[ii].Mueva_V(dt,(1-2*LAMBDA)/2);
     for(int ii = 0;ii<N;ii++)Nodo[ii].Mueva_r(dt,CHI);
-    Newton.CalculeTodasLasFuerzas(Nodo,dt);
+    Red.CalculeTodasLasFuerzas(Nodo,dt);
     for(int ii = 0;ii<N;ii++)Nodo[ii].Mueva_V(dt,LAMBDA);
     for(int ii = 0;ii<N;ii++)Nodo[ii].Mueva_r(dt,1-2*(CHI+ZETA));
-    Newton.CalculeTodasLasFuerzas(Nodo,dt);
+    Red.CalculeTodasLasFuerzas(Nodo,dt);
     for(int ii = 0;ii<N;ii++)Nodo[ii].Mueva_V(dt,LAMBDA);		    
     for(int ii = 0;ii<N;ii++)Nodo[ii].Mueva_r(dt,CHI);
-    Newton.CalculeTodasLasFuerzas(Nodo,dt);
+    Red.CalculeTodasLasFuerzas(Nodo,dt);
     for(int ii = 0;ii<N;ii++)Nodo[ii].Mueva_V(dt,(1-2*LAMBDA)/2);
     for(int ii = 0;ii<N;ii++)Nodo[ii].Mueva_r(dt,ZETA);
   }
