@@ -70,7 +70,7 @@ void InicieAnimacion(void){
   std::cout<<"unset ytics"<<std::endl;
   std::cout<<"set size ratio -1"<<std::endl;
   std::cout<<"set xrange [-10:360]"<<std::endl;
-  std::cout<<"set yrange [-10:670]"<<std::endl;
+  std::cout<<"set yrange [-10:770]"<<std::endl;
   std::cout<<"set parametric"<<std::endl;
   std::cout<<"set trange[0:15]"<<std::endl;
   std::cout<<"set isosamples 12"<<std::endl;
@@ -78,9 +78,9 @@ void InicieAnimacion(void){
 void InicieCuadro(void){
   std::cout<<"plot 0,0 ";
   std::cout<<" , "<<360/15<<"*t,0";
-  std::cout<<" , "<<360/15<<"*t,660";
-  std::cout<<" , 0,"<<660/15<<"*t";
-  std::cout<<" , 360,"<<660/15<<"*t";
+  std::cout<<" , "<<360/15<<"*t,736";
+  std::cout<<" , 0,"<<736/15<<"*t";
+  std::cout<<" , 360,"<<736/15<<"*t";
   
 }
 void TermineCuadro(void){
@@ -140,14 +140,14 @@ int main(void){
 
     for(int jj=0;jj<L;jj++){
       xran=(jj+1+0.5)*a;
-      yran=ii*std::sqrt(3)*a;
+      yran=(ii)*std::sqrt(3)*a;
       
       //------------------------(x0      , y0      ,z0, Vx0, Vy0, Vz0, m0 , R0);
       Nodo[ii*(2*L+1)+jj].Inicie(xran, yran, 0,   0,   0,  0 , m0 , R0);
     }
     for(int jj=L;jj<2*L+1;jj++){
       xran=(2*L-jj+1)*a;
-      yran=(ii+1)*std::sqrt(3)*a*0.5;
+      yran=(ii+1-0.5)*std::sqrt(3)*a;
      
       //----------------------------(x0  , y0  ,z0, Vx0, Vy0, Vz0, m0 , R0);
       Nodo[ii*(2*L+1)+jj].Inicie(xran, yran, 0,   0,   0,  0 , m0 , R0);
