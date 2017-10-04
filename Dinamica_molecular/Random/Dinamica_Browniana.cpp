@@ -69,7 +69,7 @@ void TermineCuadro(void){
 
 
 int main(void){
-  double t; double tmax=40;
+  double t; double tmax=400;
   Cuerpo Na[N];
   Crandom ran64(1);
   double E=0;
