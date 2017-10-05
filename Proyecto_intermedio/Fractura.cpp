@@ -3,8 +3,8 @@
 #include "Vector.h"
 #include "Random64.h"
 
-const int L=80;
-const int H=1000/(2*L);
+const int L=4;
+const int H=18/(2*L+1);
 const int N=(2*L+1)*H;
 const double a = 50;
 const double m0=1, R0=5;
