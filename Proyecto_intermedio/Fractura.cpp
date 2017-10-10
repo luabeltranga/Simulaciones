@@ -68,21 +68,23 @@ class Resortes{
 private:
   int Resorte[N];
 public:
-  void InicieResorte(Nodos* Nodo);
+  void ReinicieResorte(void);
   void DibujeResortes(Nodos* Nodo);
   void CalculeTodasLasFuerzas(Nodos* Nodo,double dt);
   void CalculeLaFuerzaEntre(Nodos & Nodo1,Nodos & Nodo2);
 			    
 };
 
-void Resortes::InicieResorte(Nodos* Nodo){
-  
+void Resortes::ReinicieResorte(void){
+  for(int ii =0;ii<N;ii++)Resorte[ii]=0;
 }
 void Resortes::DibujeResortes(Nodos* Nodo){
   for(int ii =0;ii<N;ii++){
     for(int jj = ii+1; jj<N;jj++){
-      
-      std::cout<<", "<<Nodo[ii].Getx()+(Nodo[jj].Getx()-Nodo[ii].Getx())/15<<"*t,"<<Nodo[ii].Gety()+(Nodo[jj].Gety()-Nodo[ii].Gety())/15<<"*t";
+      if(norma(Nodo[ii].r-Nodo[jj].r)<1.2*a){
+	Resorte[ii]+=1;
+	std::cout<<", "<<Nodo[ii].Getx()<<"+"<<(Nodo[jj].Getx()-Nodo[ii].Getx())/15.0<<"*t,"<<Nodo[ii].Gety()<<"+"<<(Nodo[jj].Gety()-Nodo[ii].Gety())/15<<"*t";
+      }
     }
   }
 }
@@ -126,11 +128,7 @@ void InicieAnimacion(void){
 }
 void InicieCuadro(void){
   std::cout<<"plot 0,0 ";
-  //std::cout<<" , "<<900/15<<"*t,0";
-  //std::cout<<" , "<<900/15<<"*t,2820";
-  //std::cout<<" , 0,"<<2820/15<<"*t";
-  //std::cout<<" , 900,"<<2820/15<<"*t";
-  
+    
 }
 void TermineCuadro(void){
   std::cout<<std::endl;
@@ -181,10 +179,10 @@ int main(void){
   Nodos Nodo[N]; 
   Resortes Red;
   
-  double tmax = 10*dt;
+  double tmax = 100;
   
   InicieAnimacion();
-  Ndibujos=2000;
+  Ndibujos=50;
   //Malla base triangular regular
   Inicializa_malla(Nodo);
   
@@ -194,7 +192,7 @@ int main(void){
     if(tdibujo>tmax/Ndibujos){
       InicieCuadro();
       for(int ii = 0;ii<N;ii++)Nodo[ii].Dibujese();
-      Red.DibujeResortes(Nodo);
+      Red.DibujeResortes(Nodo);  
       TermineCuadro();
       tdibujo=0;
     }
@@ -215,6 +213,7 @@ int main(void){
     Red.CalculeTodasLasFuerzas(Nodo,dt);
     for(int ii = 0;ii<N;ii++)Nodo[ii].Mueva_V(dt,(1-2*LAMBDA)/2);
     for(int ii = 0;ii<N;ii++)Nodo[ii].Mueva_r(dt,ZETA);
+    
   }
   
   return 0;
