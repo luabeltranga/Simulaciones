@@ -66,14 +66,26 @@ void Nodos::Dibujese(void){
 
 class Resortes{
 private:
-  
+  int Resorte[N];
 public:
+  void InicieResorte(Nodos* Nodo);
+  void DibujeResortes(Nodos* Nodo);
   void CalculeTodasLasFuerzas(Nodos* Nodo,double dt);
   void CalculeLaFuerzaEntre(Nodos & Nodo1,Nodos & Nodo2);
 			    
 };
 
-
+void Resortes::InicieResorte(Nodos* Nodo){
+  
+}
+void Resortes::DibujeResortes(Nodos* Nodo){
+  for(int ii =0;ii<N;ii++){
+    for(int jj = ii+1; jj<N;jj++){
+      
+      std::cout<<", "<<Nodo[ii].Getx()+(Nodo[jj].Getx()-Nodo[ii].Getx())/15<<"*t,"<<Nodo[ii].Gety()+(Nodo[jj].Gety()-Nodo[ii].Gety())/15<<"*t";
+    }
+  }
+}
 void Resortes:: CalculeTodasLasFuerzas(Nodos* Nodo,double dt){
   
   //Borrar todas las fuerzas y torques
@@ -114,10 +126,10 @@ void InicieAnimacion(void){
 }
 void InicieCuadro(void){
   std::cout<<"plot 0,0 ";
-  std::cout<<" , "<<900/15<<"*t,0";
-  std::cout<<" , "<<900/15<<"*t,2820";
-  std::cout<<" , 0,"<<2820/15<<"*t";
-  std::cout<<" , 900,"<<2820/15<<"*t";
+  //std::cout<<" , "<<900/15<<"*t,0";
+  //std::cout<<" , "<<900/15<<"*t,2820";
+  //std::cout<<" , 0,"<<2820/15<<"*t";
+  //std::cout<<" , 900,"<<2820/15<<"*t";
   
 }
 void TermineCuadro(void){
@@ -175,13 +187,14 @@ int main(void){
   Ndibujos=2000;
   //Malla base triangular regular
   Inicializa_malla(Nodo);
-    
+  
   for(t=tdibujo=0;t<tmax;t+=dt,tdibujo+=dt){
 
     
     if(tdibujo>tmax/Ndibujos){
       InicieCuadro();
       for(int ii = 0;ii<N;ii++)Nodo[ii].Dibujese();
+      Red.DibujeResortes(Nodo);
       TermineCuadro();
       tdibujo=0;
     }
