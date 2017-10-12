@@ -66,7 +66,7 @@ void Nodos::Dibujese(void){
 
 class Resortes{
 private:
-  int Resorte[N];
+  
 public:
   void ReinicieResorte(void);
   void DibujeResortes(Nodos* Nodo);
@@ -76,13 +76,12 @@ public:
 };
 
 void Resortes::ReinicieResorte(void){
-  for(int ii =0;ii<N;ii++)Resorte[ii]=0;
 }
 void Resortes::DibujeResortes(Nodos* Nodo){
   for(int ii =0;ii<N;ii++){
     for(int jj = ii+1; jj<N;jj++){
-      if(norma(Nodo[ii].r-Nodo[jj].r)<1.2*a){
-	Resorte[ii]+=1;
+      if((norma(Nodo[ii].r-Nodo[jj].r)<1.2*a)){
+	
 	std::cout<<", "<<Nodo[ii].Getx()<<"+"<<(Nodo[jj].Getx()-Nodo[ii].Getx())/15.0<<"*t,"<<Nodo[ii].Gety()<<"+"<<(Nodo[jj].Gety()-Nodo[ii].Gety())/15<<"*t";
       }
     }
@@ -100,6 +99,7 @@ void Resortes:: CalculeTodasLasFuerzas(Nodos* Nodo,double dt){
     }
   }
   */
+  
 }
 void  Resortes::CalculeLaFuerzaEntre(Nodos & Nodo1,Nodos & Nodo2){
 
@@ -192,7 +192,8 @@ int main(void){
     if(tdibujo>tmax/Ndibujos){
       InicieCuadro();
       for(int ii = 0;ii<N;ii++)Nodo[ii].Dibujese();
-      Red.DibujeResortes(Nodo);  
+      Red.DibujeResortes(Nodo);
+      Red.ReinicieResorte();
       TermineCuadro();
       tdibujo=0;
     }
