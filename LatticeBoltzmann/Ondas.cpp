@@ -19,7 +19,7 @@ private:
   int V[2][5]; //v[alpha][i] alpha=0 es x, alpha=1 es y
   double f[Lx][Ly][5], fnew[Lx][Ly][5]; //f[ix][i]
 public:
-  LatticeBoltzmann(void); //Constructor no tienen tipos, ve esta variable haga esto y los destructores es cuando al final debe hacer algo 
+  LatticeBoltzmann(void); 
   void  Inicie(double rho0, double Jx0, double Jy0); 
   double rho(int ix, int iy,bool CalculeConLosNew);
   double Jx(int ix, int iy);
@@ -48,12 +48,12 @@ double LatticeBoltzmann::rho(int ix,int iy,bool CalculeConLosNew){
   int i; double suma;
   if(CalculeConLosNew){
     for(suma=0 , i=0;i<5;i++){
-      suma+=V[0][i]*fnew[ix][iy][i];
+      suma+=fnew[ix][iy][i];
     }
   }
   else{
     for(suma=0 , i=0;i<5;i++){
-      suma+=V[0][i]*f[ix][iy][i];
+      suma+=f[ix][iy][i];
     }
   }
   
@@ -141,7 +141,7 @@ void LatticeBoltzmann::ImponerCampos(int ix,int iy, double &  rho0, double & Jx0
 
 int main(void){
   LatticeBoltzmann Ondas;
-  int t,tmax=160;
+  int t,tmax=260;
   double rho0=0,Jx0=0,Jy0=0;
   //Inicie
   Ondas.Inicie(rho0,Jx0,Jy0);
