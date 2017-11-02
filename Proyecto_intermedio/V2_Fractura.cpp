@@ -3,8 +3,8 @@
 #include "Vector.h"
 #include "Random64.h"
 
-const int L=4;
-const int H=18/(2*L+1);
+const int L=6;
+const int H=7;
 const int N=(2*L+1)*H;
 const double a = 50;
 const double m0=1, R0=5;
@@ -62,32 +62,55 @@ void Nodos::Dibujese(void){
   std::cout<<", "<<r.x()<<"+"<<R<<"*cos(t),"<<r.y()<<"+"<<R<<"*sin(t)";
 }
 
-//-------clase colisionador-------
+//-------clase Resortes-------
 
 class Resortes{
 private:
-  
+  bool * Conectado =nullptr;
+  double *Longitud_Natural=nullptr;
 public:
+  Resortes( Nodos * Nodo);
+  ~Resortes(void);
   void ReinicieResorte(void);
-  void DibujeResortes(Nodos* Nodo,bool dib);
+  void DibujeResortes(Nodos* Nodo);
   void CalculeTodasLasFuerzas(Nodos* Nodo,double dt);
   void CalculeLaFuerzaEntre(Nodos & Nodo1,Nodos & Nodo2);
 			    
 };
 
-void Resortes::ReinicieResorte(void){
-}
-void Resortes::DibujeResortes(Nodos* Nodo , bool dib){
+Resortes::Resortes(Nodos * Nodo){
+  Longitud_Natural=new double [N*N];
+  Conectado =new bool [N*N];
+  double test =0;
   for(int ii =0;ii<N;ii++){
     for(int jj = ii+1; jj<N;jj++){
-      if(ii==7 && jj==9){
-	dib=false;
+      test=norma(Nodo[ii].r-Nodo[jj].r);
+      if(test<1.2*a){
+	Conectado[ii*N+jj]=true;
+	Longitud_Natural[ii*N+jj]=test;
       }
       else{
-	dib=true;
+	Conectado[ii*N+jj]=false;
+	Longitud_Natural[ii*N+jj]=0.0;
       }
-      if((norma(Nodo[ii].r-Nodo[jj].r)<1.2*a) && dib){
-	std::cout<<", "<<Nodo[ii].Getx()<<"+"<<(Nodo[jj].Getx()-Nodo[ii].Getx())/15.0<<"*t,"<<Nodo[ii].Gety()<<"+"<<(Nodo[jj].Gety()-Nodo[ii].Gety())/15<<"*t";
+    }
+  }
+  
+  
+}
+Resortes::~Resortes(void){
+  delete [] Conectado;
+}
+
+
+void Resortes::ReinicieResorte(void){
+}
+void Resortes::DibujeResortes(Nodos* Nodo){
+  Conectado[1]=false;
+  for(int ii =0;ii<N;ii++){
+    for(int jj = ii+1; jj<N;jj++){
+      if(Conectado[ii*N+jj]){
+	std::cout<<std::showpos<<", "<<Nodo[ii].Getx()<<""<<(Nodo[jj].Getx()-Nodo[ii].Getx())/15.0<<"*t,"<<Nodo[ii].Gety()<<""<<(Nodo[jj].Gety()-Nodo[ii].Gety())/15<<"*t";
       }
     }
   }
@@ -182,14 +205,15 @@ int main(void){
   double tdibujo;int Ndibujos;
   
   Nodos Nodo[N]; 
-  Resortes Red;
+  Inicializa_malla(Nodo);
+  Resortes Red (Nodo);
   
   double tmax = 100;
   
   InicieAnimacion();
   Ndibujos=50;
   //Malla base triangular regular
-  Inicializa_malla(Nodo);
+  
   
   for(t=tdibujo=0;t<tmax;t+=dt,tdibujo+=dt){
 
@@ -197,7 +221,7 @@ int main(void){
     if(tdibujo>tmax/Ndibujos){
       InicieCuadro();
       for(int ii = 0;ii<N;ii++)Nodo[ii].Dibujese();
-      Red.DibujeResortes(Nodo, false);
+      Red.DibujeResortes(Nodo);
       Red.ReinicieResorte();
       TermineCuadro();
       tdibujo=0;

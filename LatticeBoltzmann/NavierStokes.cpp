@@ -135,7 +135,7 @@ void LatticeBoltzmann::Imprimase(char const * NombreArchivo,int t){
 
 int main(void){
   LatticeBoltzmann Ang;
-  int t,tmax=1;
+  int t,tmax=100;
 
   //Inicie
   Ang.Inicie(RHOinicial,Uentrada,0);
