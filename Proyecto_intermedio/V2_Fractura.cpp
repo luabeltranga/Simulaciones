@@ -3,12 +3,12 @@
 #include "Vector.h"
 #include "Random64.h"
 
-const int L=6;
-const int H=7;
+const int L=9;
+const int H=5;
 const int N=(2*L+1)*H;
 const double a = 50;
 const double m0=0.86, R0=5;
-const double EsobreA=2;
+const double EsobreA=1;
 
 
 const double ZETA=0.1786178958448091;
@@ -27,6 +27,7 @@ public:
 	      double m0,double R0);
   void BorreFuerza(void);
   void AgregueFuerza(vector3D F0);
+  void CargueMasa(double m1);
   void Mueva_r(double dt,double Constante);
   void Mueva_V(double dt,double Constante);
   void Dibujese(void);
@@ -58,7 +59,9 @@ void Nodos::Mueva_r(double dt,double Constante){
 void Nodos::Mueva_V(double dt,double Constante){
   V+=F*(Constante*dt/m); 
 }
-
+void Nodos::CargueMasa(double m1){
+  m=m1;
+}
 void Nodos::Dibujese(void){
   std::cout<<", "<<r.x()<<"+"<<R<<"*cos(t),"<<r.y()<<"+"<<R<<"*sin(t)";
 }
@@ -113,6 +116,7 @@ Resortes::~Resortes(void){
   delete [] Conectado;
   delete [] Longitud_Natural;
   delete [] ConstanteK;
+  delete [] Disorder;
 }
 
 
@@ -121,6 +125,7 @@ void Resortes::ReinicieResorte(void){
 void Resortes::DibujeResortes(Nodos* Nodo){
   for(int ii =0;ii<N;ii++){
     for(int jj = ii+1; jj<N;jj++){
+      
       if(Conectado[ii*N+jj]){
 	std::cout<<std::showpos<<", "<<Nodo[ii].Getx()<<""<<(Nodo[jj].Getx()-Nodo[ii].Getx())/15.0<<"*t,"<<Nodo[ii].Gety()<<""<<(Nodo[jj].Gety()-Nodo[ii].Gety())/15<<"*t";
       }
@@ -133,20 +138,53 @@ void Resortes:: CalculeTodasLasFuerzas(Nodos* Nodo,double dt){
   for(int ii = 0;ii<N;ii++) Nodo[ii].BorreFuerza();
   
   //Fuerza entre pares de bolas
-  for(int ii =0;ii<N;ii++){
-    for(int jj =0;jj<N;jj++){
+  for(int ii = 0;ii<N;ii++){
+    for(int jj =ii+1;jj<N;jj++){
       if(Conectado[ii*N+jj])  CalculeLaFuerzaEntre(Nodo[ii],Nodo[jj],ii,jj);
     }
   }
   
+ //Abajo
+  for(int ii =0;ii<L;ii++){
+    Nodo[ii].BorreFuerza();
+  }
+
+  //Arriba
+  for(int ii =N-1;ii>N-L-2;ii--){
+    Nodo[ii].BorreFuerza();
+  }
+  //lado derecho
+  int k=0;
+  for(int ii =1;ii<2*H;ii+=2){
+    Nodo[ii*L+k].BorreFuerza(),Nodo[(ii+2)*L+k].BorreFuerza();
+    k++;
+  }
+
+  //lado izquierdo
+  k=0;
+  for(int ii =0;ii<2*H;ii+=2){
+    Nodo[ii*L+k].BorreFuerza(),Nodo[(ii+2)*L+k].BorreFuerza();
+    k++;
+  }
   
+  
+ 
 }
 void  Resortes::CalculeLaFuerzaEntre(Nodos & Nodo1,Nodos & Nodo2, int ii,int jj){
-  vector3D F12;
-  F12=ConstanteK[ii*N+jj]*(Nodo1.r-Nodo2.r)-1.0*Nodo1.V;
+  vector3D r12,r_unitario,F12;
+  double norma12 =0;
+  r12=Nodo2.r-Nodo1.r;
+  norma12 = norma(r12);
+  if(norma12 > 1.0e-9){
+  r_unitario=r12*(1/norma12);
+  F12=ConstanteK[ii*N+jj]*(norma12-a)*r_unitario-0.0*Nodo1.V;
   Nodo1.AgregueFuerza(F12); Nodo2.AgregueFuerza(F12*(-1));
+  }
+  else{
+    F12.cargue(0,0,0);
+    Nodo2.AgregueFuerza(F12); Nodo1.AgregueFuerza(F12*(-1));  
+  }
 }
-
 
 
 
@@ -161,8 +199,8 @@ void InicieAnimacion(void){
   std::cout<<"unset xtics"<<std::endl;
   std::cout<<"unset ytics"<<std::endl;
   std::cout<<"set size ratio -1"<<std::endl;
-  std::cout<<"set xrange [-10:"<< (L+2)*a<<"]"<<std::endl;
-  std::cout<<"set yrange [-10:"<<1.5*H*a<<"]"<<std::endl;
+  //std::cout<<"set xrange [-10:"<< (L+2)*a<<"]"<<std::endl;
+  //std::cout<<"set yrange [-10:"<<1.5*H*a<<"]"<<std::endl;
   std::cout<<"set parametric"<<std::endl;
   std::cout<<"set trange[0:15]"<<std::endl;
   std::cout<<"set isosamples 12"<<std::endl;
@@ -176,7 +214,7 @@ void TermineCuadro(void){
 }
 
 void Inicializa_malla(Nodos * Nodo){
-
+ 
   double xran=0,yran=0;
   double x0=0,y0=0;
   double R=0.1*a;
@@ -213,18 +251,23 @@ void Inicializa_malla(Nodos * Nodo){
 }
 
 
-int main(void){
+int main(int argc,char ** argv){
+
+  int PasosDeTiempo = std::atoi(argv[1]);
   double t, dt=1.0e-2;
   double tdibujo;int Ndibujos;
   
   Nodos Nodo[N]; 
   Inicializa_malla(Nodo);
   Resortes Red (Nodo);
+
+    
   
-  double tmax = 10*dt;
+  //  double tmax = 10*dt;
+  double tmax = PasosDeTiempo*dt;
   
   InicieAnimacion();
-  Ndibujos=50;
+  Ndibujos=500;
   //Malla base triangular regular
   
   
