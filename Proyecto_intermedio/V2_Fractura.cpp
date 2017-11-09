@@ -7,7 +7,8 @@ const int L=6;
 const int H=7;
 const int N=(2*L+1)*H;
 const double a = 50;
-const double m0=1, R0=5;
+const double m0=0.86, R0=5;
+const double EsobreA=2;
 
 
 const double ZETA=0.1786178958448091;
@@ -66,32 +67,42 @@ void Nodos::Dibujese(void){
 
 class Resortes{
 private:
-  bool * Conectado =nullptr;
+  bool   *Conectado =nullptr;
   double *Longitud_Natural=nullptr;
+  double *ConstanteK=nullptr;
+  double *Disorder=nullptr;
+  double alpha = 0;
 public:
   Resortes( Nodos * Nodo);
   ~Resortes(void);
   void ReinicieResorte(void);
   void DibujeResortes(Nodos* Nodo);
   void CalculeTodasLasFuerzas(Nodos* Nodo,double dt);
-  void CalculeLaFuerzaEntre(Nodos & Nodo1,Nodos & Nodo2);
+  void CalculeLaFuerzaEntre(Nodos & Nodo1,Nodos & Nodo2,int ii,int jj);
 			    
 };
 
 Resortes::Resortes(Nodos * Nodo){
   Longitud_Natural=new double [N*N];
   Conectado =new bool [N*N];
+  ConstanteK= new double[N*N];
+  Disorder= new double[N*N];
   double test =0;
+  Crandom ran64(2);
   for(int ii =0;ii<N;ii++){
     for(int jj = ii+1; jj<N;jj++){
       test=norma(Nodo[ii].r-Nodo[jj].r);
       if(test<1.2*a){
 	Conectado[ii*N+jj]=true;
 	Longitud_Natural[ii*N+jj]=test;
+	ConstanteK[ii*N+jj]=test*EsobreA;
+	Disorder[ii*N+jj]=ran64.r();
       }
       else{
 	Conectado[ii*N+jj]=false;
 	Longitud_Natural[ii*N+jj]=0.0;
+	ConstanteK[ii*N+jj]=0.0;
+	Disorder[ii*N+jj]=0.0;
       }
     }
   }
@@ -100,13 +111,14 @@ Resortes::Resortes(Nodos * Nodo){
 }
 Resortes::~Resortes(void){
   delete [] Conectado;
+  delete [] Longitud_Natural;
+  delete [] ConstanteK;
 }
 
 
 void Resortes::ReinicieResorte(void){
 }
 void Resortes::DibujeResortes(Nodos* Nodo){
-  Conectado[1]=false;
   for(int ii =0;ii<N;ii++){
     for(int jj = ii+1; jj<N;jj++){
       if(Conectado[ii*N+jj]){
@@ -119,19 +131,20 @@ void Resortes:: CalculeTodasLasFuerzas(Nodos* Nodo,double dt){
   
   //Borrar todas las fuerzas y torques
   for(int ii = 0;ii<N;ii++) Nodo[ii].BorreFuerza();
-  /*
+  
   //Fuerza entre pares de bolas
   for(int ii =0;ii<N;ii++){
-    for(int jj =ii+1;jj<N+4;jj++){
-      CalculeLaFuerzaEntre(Nodo[ii],Nodo[jj]);
+    for(int jj =0;jj<N;jj++){
+      if(Conectado[ii*N+jj])  CalculeLaFuerzaEntre(Nodo[ii],Nodo[jj],ii,jj);
     }
   }
-  */
+  
   
 }
-void  Resortes::CalculeLaFuerzaEntre(Nodos & Nodo1,Nodos & Nodo2){
-
-
+void  Resortes::CalculeLaFuerzaEntre(Nodos & Nodo1,Nodos & Nodo2, int ii,int jj){
+  vector3D F12;
+  F12=ConstanteK[ii*N+jj]*(Nodo1.r-Nodo2.r)-1.0*Nodo1.V;
+  Nodo1.AgregueFuerza(F12); Nodo2.AgregueFuerza(F12*(-1));
 }
 
 
@@ -208,7 +221,7 @@ int main(void){
   Inicializa_malla(Nodo);
   Resortes Red (Nodo);
   
-  double tmax = 100;
+  double tmax = 10*dt;
   
   InicieAnimacion();
   Ndibujos=50;
