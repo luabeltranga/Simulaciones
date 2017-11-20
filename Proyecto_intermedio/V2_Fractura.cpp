@@ -5,13 +5,13 @@
 #include "Vector.h"
 #include "Random64.h"
 
-const int L=10;
+const int L=20;
 const int H=10;
 const int N=(2*L+1)*H;
 const double a = 50;
 const double m0=0.86, R0=5;
 const double EsobreA=10;
-const double C = 10.0;
+const double C = 3.0;
 
 
 const double ZETA=0.1786178958448091;
