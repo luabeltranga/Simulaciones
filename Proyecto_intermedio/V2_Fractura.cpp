@@ -1,14 +1,17 @@
+//para correr en consola ./a.out "#depasos de tiempo" | gnuplot
+
 #include <iostream>
 #include <cmath>
 #include "Vector.h"
 #include "Random64.h"
 
-const int L=9;
-const int H=5;
+const int L=10;
+const int H=10;
 const int N=(2*L+1)*H;
 const double a = 50;
 const double m0=0.86, R0=5;
-const double EsobreA=1;
+const double EsobreA=10;
+const double C = 10.0;
 
 
 const double ZETA=0.1786178958448091;
@@ -27,7 +30,6 @@ public:
 	      double m0,double R0);
   void BorreFuerza(void);
   void AgregueFuerza(vector3D F0);
-  void CargueMasa(double m1);
   void Mueva_r(double dt,double Constante);
   void Mueva_V(double dt,double Constante);
   void Dibujese(void);
@@ -59,11 +61,8 @@ void Nodos::Mueva_r(double dt,double Constante){
 void Nodos::Mueva_V(double dt,double Constante){
   V+=F*(Constante*dt/m); 
 }
-void Nodos::CargueMasa(double m1){
-  m=m1;
-}
 void Nodos::Dibujese(void){
-  std::cout<<", "<<r.x()<<"+"<<R<<"*cos(t),"<<r.y()<<"+"<<R<<"*sin(t)";
+  std::cout<<"lc rgb \"black\", "<<r.x()<<"+"<<R<<"*cos(t),"<<r.y()<<"+"<<R<<"*sin(t)";
 }
 
 //-------clase Resortes-------
@@ -75,10 +74,11 @@ private:
   double *ConstanteK=nullptr;
   double *Disorder=nullptr;
   double alpha = 0;
+  bool Iniciar_Relajacion = true;
 public:
   Resortes( Nodos * Nodo);
   ~Resortes(void);
-  void ReinicieResorte(void);
+  void Secar(void);
   void DibujeResortes(Nodos* Nodo);
   void CalculeTodasLasFuerzas(Nodos* Nodo,double dt);
   void CalculeLaFuerzaEntre(Nodos & Nodo1,Nodos & Nodo2,int ii,int jj);
@@ -91,7 +91,7 @@ Resortes::Resortes(Nodos * Nodo){
   ConstanteK= new double[N*N];
   Disorder= new double[N*N];
   double test =0;
-  Crandom ran64(2);
+  Crandom ran64(2309);
   for(int ii =0;ii<N;ii++){
     for(int jj = ii+1; jj<N;jj++){
       test=norma(Nodo[ii].r-Nodo[jj].r);
@@ -99,7 +99,7 @@ Resortes::Resortes(Nodos * Nodo){
 	Conectado[ii*N+jj]=true;
 	Longitud_Natural[ii*N+jj]=test;
 	ConstanteK[ii*N+jj]=test*EsobreA;
-	Disorder[ii*N+jj]=ran64.r();
+	Disorder[ii*N+jj]=std::fmod(ran64.r(),0.1);    
       }
       else{
 	Conectado[ii*N+jj]=false;
@@ -109,8 +109,34 @@ Resortes::Resortes(Nodos * Nodo){
       }
     }
   }
-  
-  
+
+  //abajo
+  for(int ii =0;ii<L;ii++){
+    for(int jj =0;jj<L;jj++){
+      Disorder[ii*N+jj]=10.0;
+    }
+  }
+
+  //Arriba
+  for(int ii =N-1;ii>N-L-2;ii--){
+    for(int jj =N-1;jj>N-L-2;jj--){
+      Disorder[ii*N+jj]=10.0;
+    }
+  }
+
+  //lado derecho
+  for(int ii =L-1;ii<N;){
+    Disorder[ii*N+ii+1]=10.0;
+    Disorder[(ii+1)*N+ii+2*L+1]=10.0;
+    ii+=2*L+1;
+  }
+  //lado izquierdo
+  for(int ii =0;ii<N;){
+    Disorder[ii*N+ii+2*L]=10.0;
+    Disorder[(ii+2*L)*N+ii+2*L+1]=10.0;
+    ii+=2*L+1;
+  }
+ 
 }
 Resortes::~Resortes(void){
   delete [] Conectado;
@@ -120,26 +146,47 @@ Resortes::~Resortes(void){
 }
 
 
-void Resortes::ReinicieResorte(void){
+void Resortes::Secar(void){
+  int iitest=0, jjtest=0;
+  double min=1.0;
+  if(alpha<0.3){for(int ii =0;ii<N;ii++){
+      for(int jj = 0; jj<N;jj++){
+	if( Disorder[ii*N+jj]<min && (Disorder[ii*N+jj]!=0.0 && Disorder[ii*N+jj] <10.0)){
+	iitest=ii;
+	jjtest=jj;
+	min=Disorder[ii*N+jj];
+	}
+      }
+    }
+  }
+  for(int ii =0;ii<N;ii++){
+    for(int jj = 0; jj<N;jj++){
+      Longitud_Natural[ii*N+jj]=(1-min)*Longitud_Natural[ii*N+jj];
+    }
+  }
+  
+  Disorder[iitest*N+jjtest]=0.0;
+  Conectado[iitest*N+jjtest]=false;
+  Iniciar_Relajacion=true;
 }
 void Resortes::DibujeResortes(Nodos* Nodo){
   for(int ii =0;ii<N;ii++){
     for(int jj = ii+1; jj<N;jj++){
       
       if(Conectado[ii*N+jj]){
-	std::cout<<std::showpos<<", "<<Nodo[ii].Getx()<<""<<(Nodo[jj].Getx()-Nodo[ii].Getx())/15.0<<"*t,"<<Nodo[ii].Gety()<<""<<(Nodo[jj].Gety()-Nodo[ii].Gety())/15<<"*t";
+	std::cout<<std::showpos<<"lc rgb \"black\", "<<Nodo[ii].Getx()<<""<<(Nodo[jj].Getx()-Nodo[ii].Getx())/15.0<<"*t,"<<Nodo[ii].Gety()<<""<<(Nodo[jj].Gety()-Nodo[ii].Gety())/15<<"*t ";
       }
     }
   }
 }
 void Resortes:: CalculeTodasLasFuerzas(Nodos* Nodo,double dt){
-  
-  //Borrar todas las fuerzas y torques
+  if(Iniciar_Relajacion){
+  //Borrar todas las fuerzas 
   for(int ii = 0;ii<N;ii++) Nodo[ii].BorreFuerza();
   
   //Fuerza entre pares de bolas
   for(int ii = 0;ii<N;ii++){
-    for(int jj =ii+1;jj<N;jj++){
+    for(int jj =0;jj<N;jj++){
       if(Conectado[ii*N+jj])  CalculeLaFuerzaEntre(Nodo[ii],Nodo[jj],ii,jj);
     }
   }
@@ -167,18 +214,23 @@ void Resortes:: CalculeTodasLasFuerzas(Nodos* Nodo,double dt){
     k++;
   }
   
+  }
   
- 
 }
 void  Resortes::CalculeLaFuerzaEntre(Nodos & Nodo1,Nodos & Nodo2, int ii,int jj){
   vector3D r12,r_unitario,F12;
   double norma12 =0;
+  double alpha =0;
   r12=Nodo2.r-Nodo1.r;
   norma12 = norma(r12);
   if(norma12 > 1.0e-9){
   r_unitario=r12*(1/norma12);
-  F12=ConstanteK[ii*N+jj]*(norma12-a)*r_unitario-0.0*Nodo1.V;
-  Nodo1.AgregueFuerza(F12); Nodo2.AgregueFuerza(F12*(-1));
+  F12=ConstanteK[ii*N+jj]*(norma12-a)*r_unitario;
+  Nodo1.AgregueFuerza(F12-C*Nodo1.V); Nodo2.AgregueFuerza(F12*(-1)-C*Nodo2.V);
+  alpha+=(Longitud_Natural[ii*N+jj]-norma12)/(Longitud_Natural[ii*N+jj]);
+  if(alpha>Disorder[ii*N+jj]){
+    Conectado[ii*N+jj]=false;
+  }
   }
   else{
     F12.cargue(0,0,0);
@@ -198,6 +250,7 @@ void InicieAnimacion(void){
   std::cout<<"unset border"<<std::endl;
   std::cout<<"unset xtics"<<std::endl;
   std::cout<<"unset ytics"<<std::endl;
+  std::cout<<"set style line 5 lt rgb \"black\" lw 3 pt 6"<<std::endl;
   std::cout<<"set size ratio -1"<<std::endl;
   //std::cout<<"set xrange [-10:"<< (L+2)*a<<"]"<<std::endl;
   //std::cout<<"set yrange [-10:"<<1.5*H*a<<"]"<<std::endl;
@@ -261,6 +314,7 @@ int main(int argc,char ** argv){
   Inicializa_malla(Nodo);
   Resortes Red (Nodo);
 
+  int step=0;
     
   
   //  double tmax = 10*dt;
@@ -272,18 +326,18 @@ int main(int argc,char ** argv){
   
   
   for(t=tdibujo=0;t<tmax;t+=dt,tdibujo+=dt){
-
+    step++;
     
     if(tdibujo>tmax/Ndibujos){
       InicieCuadro();
       for(int ii = 0;ii<N;ii++)Nodo[ii].Dibujese();
       Red.DibujeResortes(Nodo);
-      Red.ReinicieResorte();
       TermineCuadro();
       tdibujo=0;
     }
     
-    
+    //if(step<10)Red.Secar();
+    Red.Secar();
     
     //std::cout<<Nodo[8].Getx()<<"   "<<Nodo[8].Gety()<<std::endl;
     for(int ii = 0;ii<N;ii++)Nodo[ii].Mueva_r(dt,ZETA);
