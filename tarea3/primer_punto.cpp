@@ -9,7 +9,7 @@ const int Ly=200;
 const int Q=5;
 const double W0=1.0/3;
 //cambiar angulo en grados
-const double THETA=20.0;
+const double THETA=-6.0;
 
 const double tau=0.5;
 const double Utau=1.0/tau;
@@ -33,7 +33,6 @@ public:
   void Colisione(int t);
   void Adveccione(void);
   void Imprimase(char const * NombreArchivo,int t);
-  void ImprimaUnaLinea(char const * NombreArchivo,int t);
   
 };
 LatticeBoltzmann::LatticeBoltzmann(void){
@@ -56,7 +55,7 @@ double LatticeBoltzmann::rho(int ix,int iy,bool UseNew,double sigma){
   return suma+0.5*sigma;
 }
 double LatticeBoltzmann::Ccelda(int ix,int iy){
-  return -0.125*std::tanh(sin(THETA)*iy+cos(THETA)*ix-100)+0.375;
+  return -0.125*std::tanh(sin(THETA)*(iy-100)+cos(THETA)*(ix-200))+0.375;
  }
 double LatticeBoltzmann::Jx(int ix,int iy){
   int i; double suma;
@@ -102,8 +101,7 @@ void LatticeBoltzmann::Colisione(int t){ //de f a fnew
     for(iy=0;iy<Ly;iy++){ //Para cada celda
       sigma=GetSigma(ix,iy,t);
       rho0=rho(ix,iy,false,sigma);  Jx0=Jx(ix,iy);  Jy0=Jy(ix,iy); //Calculo campos
-      //	ImponerCampos(ix,iy,rho0,Jx0,Jy0,t);     
-	for(i=0;i<Q;i++) //para cada dirección
+      for(i=0;i<Q;i++) //para cada dirección
 	  fnew[ix][iy][i]=UmUtau*f[ix][iy][i]+Utau*feq(i,rho0,Jx0,Jy0,ix,iy); //evoluciono
     }
 }
@@ -132,17 +130,7 @@ void LatticeBoltzmann::Imprimase(char const * NombreArchivo,int t){
   }
   MiArchivo.close();
 }
-void LatticeBoltzmann::ImprimaUnaLinea(char const * NombreArchivo,int t){
-  ofstream MiArchivo(NombreArchivo); double rho0,Jx0,Jy0; double sigma;
-  int ix=Lx/2;
-  for(int iy=0;iy<Ly;iy++){
-    sigma=GetSigma(ix,iy,t);
-    rho0=rho(ix,iy,true,sigma);   Jx0=Jx(ix,iy);  Jy0=Jy(ix,iy);
-    //    ImponerCampos(ix,iy,rho0,Jx0,Jy0,t);
-    MiArchivo<<iy<<" "<<rho0<<endl;
-  }
-  MiArchivo.close();
-}
+
 //---------------- Funciones Globales --------
 
 int main(void){
@@ -161,7 +149,6 @@ int main(void){
   
   //Mostrar Resultado.
   Ondas.Imprimase("Ondas.dat",t);
-  Ondas.ImprimaUnaLinea("CorteCentralConFuente.dat",t);
-
+  
   return 0;
 }
