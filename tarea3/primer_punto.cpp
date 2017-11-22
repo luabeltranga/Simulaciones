@@ -8,8 +8,8 @@ const int Ly=200;
 
 const int Q=5;
 const double W0=1.0/3;
-//cambiar angulo en grados
-const double THETA=-6.0;
+
+const double THETA=-60.0*M_PI/180;
 
 const double tau=0.5;
 const double Utau=1.0/tau;
@@ -55,7 +55,9 @@ double LatticeBoltzmann::rho(int ix,int iy,bool UseNew,double sigma){
   return suma+0.5*sigma;
 }
 double LatticeBoltzmann::Ccelda(int ix,int iy){
-  return -0.125*std::tanh(sin(THETA)*(iy-100)+cos(THETA)*(ix-200))+0.375;
+  
+  return -0.125*std::tanh(sin(THETA)*(iy-0)+cos(THETA)*(ix-25))+0.375;
+  //return (3-tanh(sin(theta)*iy+cos(theta)*ix-25))/8;
  }
 double LatticeBoltzmann::Jx(int ix,int iy){
   int i; double suma;
@@ -149,6 +151,7 @@ int main(void){
   
   //Mostrar Resultado.
   Ondas.Imprimase("Ondas.dat",t);
-  
+
+  cout<<"Angulo difractado: "<<asin(0.5*sin(THETA))*180/M_PI<<endl;
   return 0;
 }
