@@ -5,8 +5,8 @@
 #include "Vector.h"
 #include "Random64.h"
 
-const int L=20;
-const int H=10;
+const int L=40;
+const int H=20;
 const int N=(2*L+1)*H;
 const double a = 50;
 const double m0=0.86, R0=5;
@@ -95,7 +95,7 @@ Resortes::Resortes(Nodos * Nodo){
   for(int ii =0;ii<N;ii++){
     for(int jj = ii+1; jj<N;jj++){
       test=norma(Nodo[ii].r-Nodo[jj].r);
-      if(test<1.2*a){
+      if(test<1.3*a){
 	Conectado[ii*N+jj]=true;
 	Longitud_Natural[ii*N+jj]=test;
 	ConstanteK[ii*N+jj]=test*EsobreA;
@@ -161,7 +161,7 @@ void Resortes::Secar(void){
   }
   for(int ii =0;ii<N;ii++){
     for(int jj = 0; jj<N;jj++){
-      Longitud_Natural[ii*N+jj]=(1-min)*Longitud_Natural[ii*N+jj];
+      Longitud_Natural[ii*N+jj]=(1+min)*Longitud_Natural[ii*N+jj];
     }
   }
   
@@ -224,13 +224,13 @@ void  Resortes::CalculeLaFuerzaEntre(Nodos & Nodo1,Nodos & Nodo2, int ii,int jj)
   r12=Nodo2.r-Nodo1.r;
   norma12 = norma(r12);
   if(norma12 > 1.0e-9){
-  r_unitario=r12*(1/norma12);
-  F12=ConstanteK[ii*N+jj]*(norma12-a)*r_unitario;
-  Nodo1.AgregueFuerza(F12-C*Nodo1.V); Nodo2.AgregueFuerza(F12*(-1)-C*Nodo2.V);
-  alpha+=(Longitud_Natural[ii*N+jj]-norma12)/(Longitud_Natural[ii*N+jj]);
-  if(alpha>Disorder[ii*N+jj]){
-    Conectado[ii*N+jj]=false;
-  }
+    r_unitario=r12*(1/norma12);
+    F12=ConstanteK[ii*N+jj]*(norma12-a)*r_unitario;
+    Nodo1.AgregueFuerza(F12-C*Nodo1.V); Nodo2.AgregueFuerza(F12*(-1)-C*Nodo2.V);
+    alpha+=(Longitud_Natural[ii*N+jj]-norma12)/(Longitud_Natural[ii*N+jj]);
+    if(alpha>Disorder[ii*N+jj]){
+      Conectado[ii*N+jj]=false;
+    }
   }
   else{
     F12.cargue(0,0,0);
@@ -244,8 +244,8 @@ void  Resortes::CalculeLaFuerzaEntre(Nodos & Nodo1,Nodos & Nodo2, int ii,int jj)
 //------------------Funciones Globales---------
 
 void InicieAnimacion(void){
-  //std::cout<<"set terminal gif animate"<<std::endl;
-  //std::cout<<"set output 'planeta.gif'"<<std::endl;
+  //std::cout<<"set terminal pdf enhanced"<<std::endl;
+  //std::cout<<"set output 'paralosquelesfaltavisionxd.pdf'"<<std::endl;
   std::cout<<"unset key"<<std::endl;
   std::cout<<"unset border"<<std::endl;
   std::cout<<"unset xtics"<<std::endl;
@@ -336,10 +336,9 @@ int main(int argc,char ** argv){
       tdibujo=0;
     }
     
-    //if(step<10)Red.Secar();
     Red.Secar();
     
-    //std::cout<<Nodo[8].Getx()<<"   "<<Nodo[8].Gety()<<std::endl;
+    
     for(int ii = 0;ii<N;ii++)Nodo[ii].Mueva_r(dt,ZETA);
     Red.CalculeTodasLasFuerzas(Nodo,dt);
     for(int ii = 0;ii<N;ii++)Nodo[ii].Mueva_V(dt,(1-2*LAMBDA)/2);
