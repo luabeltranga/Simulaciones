@@ -34,6 +34,7 @@ public:
   void Adveccione(void);
   void Imprimase(char const * NombreArchivo, int t);
   void ImprimaseUnaLinea(char const * NombreArchivo, int t);
+  void Max(int t);
   
 };
 LatticeBoltzmann::LatticeBoltzmann(void){
@@ -104,10 +105,7 @@ void LatticeBoltzmann::Colisione(int t){ //de f a fnew
       sigma=GetSigma(ix,iy,t);
       if((ix>=50 && ix <105)){
 	//primer hueco
-	if(((iy>=0 && iy <=78) || (iy>=82 && iy<= 118))){
-	  rho0=rho(ix,iy,false,sigma);  Jx0=0;  Jy0=0; //Calculo campos
-	}
-	else if(iy>=122 && iy <=600) {
+	if(((iy>=0 && iy <=98) || (iy>=102 && iy<= 600))){
 	  rho0=rho(ix,iy,false,sigma);  Jx0=0;  Jy0=0; //Calculo campos
 	}
 	else{
@@ -167,28 +165,41 @@ void LatticeBoltzmann::ImprimaseUnaLinea(char const * NombreArchivo,int t){
   //MiArchivo.close();
 }
 
+void LatticeBoltzmann::Max(int t){
+  int ix =150, iy=100;
+  double rho0,Jx0,Jy0,sigma;
+  sigma=GetSigma(ix,iy,t);
+  rho0=rho(ix,iy,true,sigma);   Jx0=Jx(ix,iy);  Jy0=Jy(ix,iy);
+  cout<<t<<" "<<rho0*rho0;
+  
+  
+  cout<<endl;
+      
+}
+
 
 //---------------- Funciones Globales --------
 
 int main(void){
   LatticeBoltzmann Ondas;
-  int t,tmax=364;
+  int t,tmax=358;
 
   double rho0=0,Jx0=0,Jy0=0;
 
   //Inicie
   Ondas.Inicie(rho0,Jx0,Jy0);
-  cout<<"set pm3d map "<<endl;
-  cout<<"set size ratio 1 "<<endl;
+  //cout<<"set pm3d map "<<endl;
+  //cout<<"set size ratio 1 "<<endl;
 
-  //cout<<"set xrange [0:200] "<<endl;
-    
+  cout<<"set xrange [0:200] "<<endl;
+  
   //Corra
   for(t=0;t<tmax;t++){
     Ondas.Colisione(t);
     Ondas.Adveccione();
     //Ondas.Imprimase("Espejo.dat",t);
     Ondas.ImprimaseUnaLinea("Espejo.dat",t);
+    //Ondas.Max(t);
     //cerr<<t<<endl;
   }
   
