@@ -8,8 +8,8 @@ const int Ly=600;
 
 const int Q=5;
 const double W0=1.0/3;
-//cambiar angulo en grados
-const double THETA=20.0;
+
+
 
 const double tau=0.5;
 const double Utau=1.0/tau;
@@ -57,7 +57,6 @@ double LatticeBoltzmann::rho(int ix,int iy,bool UseNew,double sigma){
   return suma+0.5*sigma;
 }
 double LatticeBoltzmann::Ccelda(int ix,int iy){
-  //return -0.125*std::tanh(ix-27)+0.375;
   return 0.5;
 }
 double LatticeBoltzmann::Jx(int ix,int iy){
@@ -84,8 +83,8 @@ double LatticeBoltzmann::feq(int i,double rho0,double Jx0,double Jy0,int ix,int 
 }
 
 double LatticeBoltzmann::GetSigma(int ix,int iy,int t){
-  double A=10,lambda=10,omega=2*M_PI*Ccelda(ix,iy)/lambda;
-  if(ix==0 && iy == 100 && t<100)
+  double A=100,lambda=10,omega=2*M_PI*Ccelda(ix,iy)/lambda;
+  if(ix==0 && iy == 100)
     return A*sin(omega*t);
   else
     return 0;
@@ -103,7 +102,7 @@ void LatticeBoltzmann::Colisione(int t){ //de f a fnew
   for(ix=0;ix<Lx;ix++)
     for(iy=0;iy<Ly;iy++){ //Para cada celda
       sigma=GetSigma(ix,iy,t);
-      if((ix>=50 && ix <105)){
+      if((ix>=50 && ix <55)){
 	//primer hueco
 	if(((iy>=0 && iy <=98) || (iy>=102 && iy<= 600))){
 	  rho0=rho(ix,iy,false,sigma);  Jx0=0;  Jy0=0; //Calculo campos
@@ -137,32 +136,33 @@ void LatticeBoltzmann::Imprimase(char const * NombreArchivo,int t){
     for(int iy=0;iy<Ly/3;iy++){
       sigma=GetSigma(ix,iy,t);
       rho0=rho(ix,iy,true,sigma);   Jx0=Jx(ix,iy);  Jy0=Jy(ix,iy);
-      //MiArchivo<<ix<<" "<<iy<<" "<<rho0<<endl;
-      cout<<"splot [0:200] '-' "<<endl;
-      cout<<ix<<" "<<iy<<" "<<rho0<<endl;
+      MiArchivo<<ix<<" "<<iy<<" "<<rho0<<endl;
+      //cout<<"splot [0:200] '-' "<<endl;
+      //cout<<ix<<" "<<iy<<" "<<rho0<<endl;
     }
-    cout<<endl;
-    //MiArchivo<<endl;
+    //cout<<endl;
+    MiArchivo<<endl;
   }
-  cout<<"e "<<endl;
-  //MiArchivo.close();
+  //cout<<"e "<<endl;
+  MiArchivo.close();
 }
 
 void LatticeBoltzmann::ImprimaseUnaLinea(char const * NombreArchivo,int t){
   ofstream MiArchivo(NombreArchivo); double rho0,Jx0,Jy0; double sigma;
   int ix =150;
+  sigma=GetSigma(ix,100,t);
+  rho0=rho(ix,100,true,sigma);   Jx0=Jx(ix,100);  Jy0=Jy(ix,100);
+  double norm=rho0*rho0;
   for(int iy=0;iy<Ly/3;iy++){
-      sigma=GetSigma(ix,iy,t);
-      rho0=rho(ix,iy,true,sigma);   Jx0=Jx(ix,iy);  Jy0=Jy(ix,iy);
-      //MiArchivo<<ix<<" "<<iy<<" "<<rho0<<endl;
-      cout<<"plot '-' w l"<<endl;
-      cout<<iy<<" "<<rho0*rho0;
-	
+    sigma=GetSigma(ix,iy,t);
+    rho0=rho(ix,iy,true,sigma);   Jx0=Jx(ix,iy);  Jy0=Jy(ix,iy);
+    MiArchivo<<iy<<" "<<rho0*rho0/norm<<endl;
+    //cout<<"plot '-' w l"<<endl;
+    //cout<<iy<<" "<<rho0*rho0/norm;
+    
   }
-  cout<<endl;
-  //MiArchivo<<endl;
-  cout<<"e "<<endl;
-  //MiArchivo.close();
+  //cout<<"e "<<endl;
+  MiArchivo.close();
 }
 
 void LatticeBoltzmann::Max(int t){
@@ -182,7 +182,7 @@ void LatticeBoltzmann::Max(int t){
 
 int main(void){
   LatticeBoltzmann Ondas;
-  int t,tmax=358;
+  int t,tmax=318;
 
   double rho0=0,Jx0=0,Jy0=0;
 
@@ -197,14 +197,16 @@ int main(void){
   for(t=0;t<tmax;t++){
     Ondas.Colisione(t);
     Ondas.Adveccione();
-    //Ondas.Imprimase("Espejo.dat",t);
-    Ondas.ImprimaseUnaLinea("Espejo.dat",t);
-    //Ondas.Max(t);
+        //Ondas.Max(t);
     //cerr<<t<<endl;
   }
   
   //Mostrar Resultado.
 
+  //Ondas.ImprimaseUnaLinea("Unarendija_esferica.dat",t);
+  Ondas.Imprimase("Unarendija_esferica3D.dat",t);
+  
+  
   
   return 0;
 }
